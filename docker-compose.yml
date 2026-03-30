@@ -1,0 +1,114 @@
+version: '3.9'
+
+services:
+
+  # Reverse proxy / entry point
+  nginx:
+    container_name: nginx
+    build: ./nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - frontend
+      - gateway
+      - service-checker
+      - status-page
+    networks:
+      - transcendence-net
+
+  # Frontend
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    networks:
+      - transcendence-net
+
+  # Gateway API
+  gateway:
+    container_name: gateway
+    build: ./backend/gateway
+    networks:
+      - transcendence-net
+
+  # Auth service
+  auth-service:
+    container_name: auth-service
+    build: ./backend/auth-service
+    networks:
+      - transcendence-net
+
+  # User service
+  user-service:
+    container_name: user-service
+    build: ./backend/user-service
+    networks:
+      - transcendence-net
+
+  # Game service
+  game-service:
+    container_name: game-service
+    build: ./backend/game-service
+    networks:
+      - transcendence-net
+
+  # Chat service
+  chat-service:
+    container_name: chat-service
+    build: ./backend/chat-service
+    networks:
+      - transcendence-net
+
+  # Health system
+  service-checker:
+    container_name: service-checker
+    build: ./healthcheck/service-checker
+    networks:
+      - transcendence-net
+
+  status-page:
+    container_name: status-page
+    build: ./healthcheck/status-page
+    networks:
+      - transcendence-net
+
+  # Database
+  postgres:
+    container_name: postgres
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: transcendence
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - transcendence-net
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - transcendence-net
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    ports:
+      - "3006:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - transcendence-net
+
+# Custom network for all services
+networks:
+  transcendence-net:
+    driver: bridge
+
+# Persistent volume for database
+volumes:
+  postgres_data:
