@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
 
   # Reverse proxy / entry point
@@ -27,6 +25,8 @@ services:
   gateway:
     container_name: gateway
     build: ./backend/gateway
+    ports:
+      - "3005:3005"
     networks:
       - transcendence-net
 
@@ -34,6 +34,8 @@ services:
   auth-service:
     container_name: auth-service
     build: ./backend/auth-service
+    ports:
+      - "3001:3000"
     networks:
       - transcendence-net
 
@@ -41,6 +43,8 @@ services:
   user-service:
     container_name: user-service
     build: ./backend/user-service
+    ports:
+      - "3002:3000"
     networks:
       - transcendence-net
 
@@ -48,13 +52,8 @@ services:
   game-service:
     container_name: game-service
     build: ./backend/game-service
-    networks:
-      - transcendence-net
-
-  # Chat service
-  chat-service:
-    container_name: chat-service
-    build: ./backend/chat-service
+    ports:
+      - "3003:3000"
     networks:
       - transcendence-net
 
@@ -62,12 +61,16 @@ services:
   service-checker:
     container_name: service-checker
     build: ./healthcheck/service-checker
+    ports:
+      - "4000:4000"
     networks:
       - transcendence-net
 
   status-page:
     container_name: status-page
     build: ./healthcheck/status-page
+    ports:
+      - "3007:3000"
     networks:
       - transcendence-net
 
@@ -100,7 +103,8 @@ services:
     ports:
       - "3006:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=superadmin
+      - GF_SECURITY_ADMIN_PASSWORD=superpassword
     networks:
       - transcendence-net
 

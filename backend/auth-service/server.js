@@ -1,12 +1,23 @@
-const http = require('http');
-const PORT = 3000;
-
-
+const express = require('express');
 const client = require('prom-client');
 
-// Create a default registry
+const app = express();
+const PORT = process.env.PORT || 3000;
+const SERVICE_NAME = 'auth-service';
+
+// Prometheus setup
 const register = new client.Registry();
 client.collectDefaultMetrics({ register });
+
+// Health endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: `${SERVICE_NAME} running` });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.status(200).send(`${SERVICE_NAME} is working!`);
+});
 
 // Metrics endpoint
 app.get('/metrics', async (req, res) => {
@@ -14,21 +25,12 @@ app.get('/metrics', async (req, res) => {
   res.end(await register.metrics());
 });
 
-const server = http.createServer((req, res) => {
-  if (req.method === 'GET' && req.url === '/health') {
-    res.writeHead(200, {'Content-Type': 'application/json'});
-    // Change the message here:
-    res.end(JSON.stringify({status: 'auth service running'}));
-    return;
-  }
-
-  if (req.method === 'GET' && req.url === '/') {
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.end('Auth service is working!');
-  return;
-  }
-  res.writeHead(404);
-  res.end();
+// 404 fallback
+app.use((req, res) => {
+  res.status(404).send();
 });
 
-server.listen(PORT, '0.0.0.0', () => console.log(`Auth service running on ${PORT}`));
+// Start server
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`${SERVICE_NAME} running on port ${PORT}`);
+});

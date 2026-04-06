@@ -9,7 +9,6 @@ const services = {
   "auth-service": "http://auth-service:3000/health",
   "user-service": "http://user-service:3000/health",
   "game-service": "http://game-service:3000/health",
-  "chat-service": "http://chat-service:3000/health",
   "gateway": "http://gateway:3005/health"
 };
 
