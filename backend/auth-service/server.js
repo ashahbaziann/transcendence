@@ -1,3 +1,4 @@
+console.log("MTASAAAAAV!");
 const express = require('express');
 const client = require('prom-client');
 
@@ -17,6 +18,24 @@ app.get('/health', (req, res) => {
 // Root endpoint
 app.get('/', (req, res) => {
   res.status(200).send(`${SERVICE_NAME} is working!`);
+});
+
+//Inga's test
+app.use(express.json());
+
+app.get('/test', (req, res) => {
+  res.json({
+    ok: true,
+    service: "auth-service"
+  });
+});
+
+app.post('/register', (req, res) => {
+  res.json({
+    ok: true,
+    message: "registered (no DB yet)",
+    data: req.body
+  });
 });
 
 // Metrics endpoint

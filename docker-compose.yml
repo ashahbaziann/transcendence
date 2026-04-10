@@ -18,8 +18,14 @@ services:
   frontend:
     container_name: frontend
     build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     networks:
       - transcendence-net
+    command: npm run dev
 
   # Gateway API
   gateway:
@@ -97,16 +103,16 @@ services:
     networks:
       - transcendence-net
 
-  grafana:
-    container_name: grafana
-    image: grafana/grafana:latest
-    ports:
-      - "3006:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=superadmin
-      - GF_SECURITY_ADMIN_PASSWORD=superpassword
-    networks:
-      - transcendence-net
+  #grafana:
+  #  container_name: grafana
+  #  image: grafana/grafana:latest
+  #  ports:
+  #    - "3006:3000"
+  #  environment:
+  #    - GF_SECURITY_ADMIN_USER=superadmin
+  #    - GF_SECURITY_ADMIN_PASSWORD=superpassword
+  # networks:
+  #    - transcendence-net
 
 # Custom network for all services
 networks:
