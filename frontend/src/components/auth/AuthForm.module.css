@@ -1,0 +1,84 @@
+/* ===== PAGE CENTER WRAPPER ===== */
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #22355f, #3b1e38);
+  padding: 20px;
+}
+
+/* ===== AUTH CARD ===== */
+.card {
+  width: 100%;
+  max-width: 380px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* ===== TITLE ===== */
+.title {
+  font-size: 24px;
+  color: white;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* ===== INPUT ===== */
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: white;
+  outline: none;
+  transition: 0.2s;
+}
+
+.input:focus {
+  border-color: #60a5fa;
+  background: rgba(255,255,255,0.08);
+}
+
+/* ===== BUTTON ===== */
+.button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #3b82f6;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.button:hover {
+  background: #2563eb;
+}
+
+/* ===== ERROR TEXT ===== */
+.error {
+  color: #f87171;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ===== OAUTH BUTTON ===== */
+.oauth {
+  background: white;
+  color: black;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.oauth:hover {
+  background: #e5e7eb;
+}
