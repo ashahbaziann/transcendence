@@ -1,0 +1,5 @@
+1 login2faEnableResponse        Сервер возвращает QR код
+2 login2faVerifyRequest         Пользователь подтверждает включение
+3 login2faVerifyResponse        Сервер подтверждает — 2FA включена
+4 login2faRequired              Сервер просит код при входе
+5 login2faRequest               Пользователь вводит код при входе
