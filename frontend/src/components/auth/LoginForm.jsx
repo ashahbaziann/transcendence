@@ -2,8 +2,8 @@ import { useState } from "react";
 import styles from "./AuthForm.module.css"
 
 // function to handle API call
-async function registerUser(data) {
-  const response = await fetch("http://localhost:3005/api/auth/register", {
+async function loginUser(data) {
+  const response = await fetch("http://localhost:3005/api/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -15,14 +15,9 @@ async function registerUser(data) {
 }
 
 
-
-
-
-
 export default function LoginForm() {
   // state to store input values
   const [form, setForm] = useState({
-    username: "",
     email: "",
     password: "",
   });
@@ -39,26 +34,17 @@ export default function LoginForm() {
     try {
       const res = await registerUser(form); // call backend
       console.log("Response:", res); // for now just log
-      alert("Registered successfully!"); // simple feedback
+      alert("Legged In successfully!"); // simple feedback
     } catch (err) {
       console.error("Error:", err);
-      alert("Registration failed!");
+      alert("Logging in failed!");
     }
   };
 
   return (
-    <div className={styles.container}>
+    <div>
       <form className={styles.card} onSubmit={handleSubmit}>
-         <h2 className={styles.title}>Register</h2>
-            <input
-              className={styles.input}
-              type="text"
-              name="username"
-              placeholder="Username"
-              value={form.username}
-              onChange={handleChange}
-              required
-            />
+         <h2 className={styles.title}>Log In</h2>
             <input
               className={styles.input}
               type="email"
@@ -77,7 +63,7 @@ export default function LoginForm() {
               onChange={handleChange}
               required
             />
-            <button className={styles.button} type="submit">Register</button>
+            <button className={styles.button} type="submit">Log In</button>
           </form>
     </div>
   );

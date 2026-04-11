@@ -1,6 +1,7 @@
-import Home from "./pages/HomePage";
+import LandingPage from "./pages/LandingPage";
+import './index.css'
 
 export default function App() {
-  return <Home />;
+  return <LandingPage />;
 }
 

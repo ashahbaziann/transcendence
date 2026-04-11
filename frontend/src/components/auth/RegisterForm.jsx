@@ -47,7 +47,7 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className={styles.container}>
+    <div>
       <form className={styles.card} onSubmit={handleSubmit}>
          <h2 className={styles.title}>Register</h2>
             <input
