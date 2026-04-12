@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styles from "./LandingPageContentLeft.module.css";
+import styles from "./LandingPageContent.module.css";
 
 export default function LandingPageContentLeft() {
   const [pos, setPos] = useState({ x: 50, y: 50 });
@@ -34,10 +34,10 @@ export default function LandingPageContentLeft() {
   }, [vel]);
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.left}>
 
-        <h1 className={styles.logo}>TRANSCENDENCE </h1>
-        <h2 style={{ textAlign: "center" }}>Pong Game </h2>
+        <h1 className={styles.heading}>TRANSCENDENCE</h1>
+        <h2 className={styles.tagline}>Pong Game</h2>
         <div className={styles.board}>
             <div
             className={styles.ball}
@@ -47,7 +47,7 @@ export default function LandingPageContentLeft() {
             }}
             />
         </div>
-        <p className={styles.subtitle}>Originally an engineering training experiment, not a game.</p>
+        <p className={styles.description}>Originally an engineering training experiment, not a game.</p>
     </div>
   );
 }

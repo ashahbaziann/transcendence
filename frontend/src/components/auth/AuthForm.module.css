@@ -1,7 +1,7 @@
 /* ===== AUTH CARD ===== */
 .card {
   width: 380px;
-  min-height: 380px;
+  min-height: 350px;
 
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
@@ -74,19 +74,33 @@
 
 /* ===== OAUTH BUTTON ===== */
 .oauth {
-  background: white;
-  color: black;
-  font-weight: 500;
-  margin-top: 10px;
+
+  background: #3b82f6;
+  color: white;
+  font-weight: bold;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  width: 100%;
+  max-width: 800px;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+
 }
 
 .oauth:hover {
   background: #e5e7eb;
+  transform: translateY(-2px);
 }
 
 .card {
   animation: popIn 0.6s ease-out;
   transition: transform 0.2s ease;
+  min-width: 260px;
+  max-width: 380px;
+
 }
 
 .card:hover {

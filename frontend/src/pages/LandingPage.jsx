@@ -1,25 +1,14 @@
-import RegisterForm from "../components/auth/RegisterForm";
-import LoginForm from "../components/auth/LoginForm";
 import styles from "./LandingPage.module.css"
-import LandingPageContentLeft from "../components/content/LandingPageContentLeft";
+import LeftContent from "../components/content/LandingPageContentLeft";
+import RightContent from "../components/content/LandingPageContentRight";
 
 
-export default function Home() {
+export default function LandingPage() {
   return (
     <div className={styles.container}>
       
-      <LandingPageContentLeft />
-
-      <div className={styles.right}>
-        
-        <div className={styles.forms}>
-        
-          <LoginForm />
-          <RegisterForm />
-        
-        </div>
-
-      </div>
+      <LeftContent />
+      <RightContent />
 
     </div>
   );

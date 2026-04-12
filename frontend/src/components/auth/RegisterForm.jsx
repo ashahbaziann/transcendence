@@ -14,11 +14,6 @@ async function registerUser(data) {
   return response.json();
 }
 
-
-
-
-
-
 export default function RegisterForm() {
   // state to store input values
   const [form, setForm] = useState({
