@@ -1,8 +1,14 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const clientProm = require('prom-client');
 
 const app = express();
 const PORT = 3005;
+
+// Prometheus setup
+const register = new clientProm.Registry();
+clientProm.collectDefaultMetrics({ register });
+
 
 // Root
 app.get(['/', '/index.html'], (req, res) => {
@@ -12,6 +18,12 @@ app.get(['/', '/index.html'], (req, res) => {
 // Health
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
+});
+
+// Metrics
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
 });
 
 // Proxy routes

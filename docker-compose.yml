@@ -56,6 +56,15 @@ services:
       - "3003:3000"
     networks:
       - transcendence-net
+  
+
+  game-standalone:
+    container_name: game-standalone
+    build: ./backend/game-standalone
+    ports:
+      - "3010:3010"
+    networks:
+      - transcendence-net
 
   # Health system
   service-checker:
@@ -96,6 +105,11 @@ services:
       - "9090:9090"
     networks:
       - transcendence-net
+    depends_on:
+      - auth-service
+      - user-service
+      - game-service
+      - gateway
 
   grafana:
     container_name: grafana
@@ -105,8 +119,15 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=superadmin
       - GF_SECURITY_ADMIN_PASSWORD=superpassword
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/etc/grafana/dashboards
+      - grafana_data:/var/lib/grafana
+
     networks:
       - transcendence-net
+    depends_on:
+      - prometheus
 
 # Custom network for all services
 networks:
@@ -116,3 +137,4 @@ networks:
 # Persistent volume for database
 volumes:
   postgres_data:
+  grafana_data:

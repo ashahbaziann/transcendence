@@ -25,6 +25,7 @@ app.get('/metrics', async (req, res) => {
   res.end(await register.metrics());
 });
 
+
 // 404 fallback
 app.use((req, res) => {
   res.status(404).send();
