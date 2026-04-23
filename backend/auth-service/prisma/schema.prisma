@@ -1,0 +1,56 @@
+datasource db {
+  provider = "postgresql"
+  schemas  = ["auth"]
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+model LocalAccount {
+  id        String   @id @default(cuid())
+  userId    Int      @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  @@map("auth_local_accounts")
+  @@schema("auth")
+}
+
+model oAuthAccount {
+  id           String   @id @default(cuid())
+  userId       Int
+  provider     String
+  providerId   String
+  email        String
+  registeredAt DateTime @default(now())
+
+  @@unique([provider, providerId])
+  @@map("auth_oauth_accounts")
+  @@schema("auth")
+}
+
+model TwoFactorSecret {
+  id          String   @id @default(cuid())
+  userId      Int      @unique
+  secret      String   @unique
+  isVerified  Boolean  @default(false)
+  generatedAt DateTime @default(now())
+  changedAt   DateTime @updatedAt
+
+  @@map("auth_two_factor_secrets")
+  @@schema("auth")
+}
+
+model TwoFactorTicket {
+  id          String   @id @default(cuid())
+  userId      Int
+  expireTime  DateTime
+  activated   Boolean  @default(false)
+  generatedAt DateTime @default(now())
+
+  @@map("auth_two_factor_tickets")
+  @@schema("auth")
+}
