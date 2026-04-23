@@ -40,8 +40,13 @@ services:
   auth-service:
     container_name: auth-service
     build: ./backend/auth-service
+    env_file:
+      - ./backend/auth-service/.env
     ports:
       - "3001:3000"
+    volumes:
+      - ./backend/auth-service:/app    # ← добавить эту строку
+      - /app/node_modules
     networks:
       - transcendence-net
 
