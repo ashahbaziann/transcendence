@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./AuthForm.module.css"
+
 
 // function to handle API call
 async function registerUser(data) {
@@ -11,10 +13,11 @@ async function registerUser(data) {
     body: JSON.stringify(data),
   }
 );
-  return response.json();
+return response.json();
 }
 
 export default function RegisterForm() {
+  const navigate = useNavigate();
   // state to store input values
   const [form, setForm] = useState({
     username: "",
@@ -34,7 +37,9 @@ export default function RegisterForm() {
     try {
       const res = await registerUser(form); // call backend
       console.log("Response:", res); // for now just log
-      alert("Registered successfully!"); // simple feedback
+      //alert("Registered successfully!"); // simple feedback
+
+      navigate("/game");
     } catch (err) {
       console.error("Error:", err);
       alert("Registration failed!");
