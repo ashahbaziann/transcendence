@@ -1,11 +1,10 @@
 datasource db {
   provider = "postgresql"
-  schemas  = ["auth"]
+  url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
+  provider = "prisma-client-js"
 }
 
 model LocalAccount {
@@ -16,7 +15,6 @@ model LocalAccount {
   createdAt DateTime @default(now())
 
   @@map("auth_local_accounts")
-  @@schema("auth")
 }
 
 model oAuthAccount {
@@ -29,7 +27,6 @@ model oAuthAccount {
 
   @@unique([provider, providerId])
   @@map("auth_oauth_accounts")
-  @@schema("auth")
 }
 
 model TwoFactorSecret {
@@ -41,7 +38,6 @@ model TwoFactorSecret {
   changedAt   DateTime @updatedAt
 
   @@map("auth_two_factor_secrets")
-  @@schema("auth")
 }
 
 model TwoFactorTicket {
@@ -52,5 +48,4 @@ model TwoFactorTicket {
   generatedAt DateTime @default(now())
 
   @@map("auth_two_factor_tickets")
-  @@schema("auth")
 }
