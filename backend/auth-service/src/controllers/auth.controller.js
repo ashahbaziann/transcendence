@@ -1,6 +1,9 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { validate } = require('../utils/validator');
+const loginRequestSchema = require('../schemas/loginRequestSchema');
+const registerRequestSchema = require('../schemas/registerRequestSchema');
 
 const prisma = new PrismaClient();
 
@@ -8,11 +11,10 @@ const prisma = new PrismaClient();
 async function register(req, res) {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password required' });
+    const errors = validate(registerRequestSchema, req.body);
+    if(errors){
+      return res.status(400).json({ error: 'Validation failed', details: errors });
     }
-
     const existing = await prisma.localAccount.findUnique({ where: { email } });
     if (existing) {
       return res.status(409).json({ error: 'Email already exists' });
@@ -45,11 +47,10 @@ async function register(req, res) {
 async function login(req, res) {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password required' });
+    const errors = validate(loginRequestSchema, req.body);
+    if (errors) {
+    return res.status(400).json({ error: 'Validation failed', details: errors });
     }
-
     const user = await prisma.localAccount.findUnique({ where: { email } });
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -73,4 +74,13 @@ async function login(req, res) {
   }
 }
 
-module.exports = { register, login };
+async function logout(req, res){
+  try{
+    res.status(200).json({message: 'Logout successful'});
+  } catch (err){
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+module.exports = { register, login, logout  };

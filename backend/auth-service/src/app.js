@@ -1,6 +1,7 @@
 const express = require('express');
 const client = require('prom-client');
 const authRoutes = require('./routes/auth.routes');
+const passport = require('./config/passport');
 
 function buildApp() {
   const app = express();
@@ -11,6 +12,7 @@ function buildApp() {
 
   // === Middleware ===
   app.use(express.json());
+   app.use(passport.initialize());
 
   // === Health check ===
   app.get('/health', (req, res) => {
@@ -24,7 +26,7 @@ function buildApp() {
   });
 
   // === Маршруты авторизации ===
-  app.use('/auth', authRoutes);
+  app.use('/', authRoutes);
 
   // === 404 ===
   app.use((req, res) => {
