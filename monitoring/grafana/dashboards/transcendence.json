@@ -1,0 +1,12 @@
+{
+  "title": "Transcendence Services",
+  "panels": [
+    {"title":"CPU Usage","type":"timeseries","gridPos":{"x":0,"y":0,"w":12,"h":8},"targets":[{"expr":"rate(process_cpu_user_seconds_total{job=\"services\"}[1m])","legendFormat":"{{instance}}"}]},
+    {"title":"Memory Usage","type":"timeseries","gridPos":{"x":12,"y":0,"w":12,"h":8},"targets":[{"expr":"process_resident_memory_bytes{job=\"services\"}","legendFormat":"{{instance}}"}]},
+    {"title":"Heap Used","type":"timeseries","gridPos":{"x":0,"y":8,"w":12,"h":8},"targets":[{"expr":"nodejs_heap_size_used_bytes{job=\"services\"}","legendFormat":"{{instance}}"}]},
+    {"title":"Event Loop Lag","type":"timeseries","gridPos":{"x":12,"y":8,"w":12,"h":8},"targets":[{"expr":"nodejs_eventloop_lag_seconds{job=\"services\"}","legendFormat":"{{instance}}"}]},
+    {"title":"Services Status","type":"timeseries","gridPos":{"x":0,"y":16,"w":24,"h":8},"targets":[{"expr":"up{job=\"services\"}","legendFormat":"{{instance}}"}]}
+  ],
+  "schemaVersion": 36,
+  "version": 1
+}

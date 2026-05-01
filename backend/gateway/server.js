@@ -62,10 +62,16 @@
 
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const clientProm = require('prom-client');
 const cors = require('cors');
 
 const app = express();
 const PORT = 3005;
+
+// Prometheus setup
+const register = new clientProm.Registry();
+clientProm.collectDefaultMetrics({ register });
+
 
 app.use(cors({
   origin: 'http://localhost:5173',
@@ -87,6 +93,14 @@ app.get('/', (req, res) => {
 app.get('/health', (req, res) => {
   res.json({status: 'ok'});
 });
+
+// Metrics
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+
+// Proxy routes
 
 app.use('/auth', createProxyMiddleware({
   target: 'http://auth-service:3000',
