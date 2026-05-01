@@ -6,7 +6,7 @@ import { useGameState } from "../components/game/useGameState";
 import { useGameSocket } from "../components/game/useGameSocket";
 import { useGameInput } from "../components/game/useGameInput";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 /* ---------------- MOCK SOCKET ---------------- */
 function useMockSocket(onMessage) {

@@ -38,7 +38,7 @@ export default function LoginForm() {
       console.log("Response:", res); // for now just log
       alert("Legged In successfully!"); // simple feedback
       
-      navigate("/");
+      navigate("/game");
     } catch (err) {
       console.error("Error:", err);
       alert("Logging in failed!");
