@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./AuthForm.module.css"
 
 // function to handle API call
 async function loginUser(data) {
-  const response = await fetch("http://localhost:3005/api/auth/login", {
+  const response = await fetch("http://localhost:3005/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -16,6 +17,7 @@ async function loginUser(data) {
 
 
 export default function LoginForm() {
+    const navigate = useNavigate();
   // state to store input values
   const [form, setForm] = useState({
     email: "",
@@ -32,9 +34,11 @@ export default function LoginForm() {
     e.preventDefault(); // prevent page refresh
 
     try {
-      const res = await registerUser(form); // call backend
+      const res = await loginUser(form); // call backend
       console.log("Response:", res); // for now just log
       alert("Legged In successfully!"); // simple feedback
+      
+      navigate("/");
     } catch (err) {
       console.error("Error:", err);
       alert("Logging in failed!");

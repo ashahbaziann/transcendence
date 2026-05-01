@@ -5,7 +5,7 @@ import styles from "./AuthForm.module.css"
 
 // function to handle API call
 async function registerUser(data) {
-  const response = await fetch("http://localhost:3005/api/auth/register", {
+  const response = await fetch("http://localhost:3005/auth/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -37,9 +37,9 @@ export default function RegisterForm() {
     try {
       const res = await registerUser(form); // call backend
       console.log("Response:", res); // for now just log
-      //alert("Registered successfully!"); // simple feedback
+      alert("Registered successfully!"); // simple feedback
 
-      navigate("/game");
+      //navigate("/game");
     } catch (err) {
       console.error("Error:", err);
       alert("Registration failed!");
