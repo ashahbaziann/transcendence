@@ -1,11 +1,71 @@
+// const express = require('express');
+// const { createProxyMiddleware } = require('http-proxy-middleware');
+
+// const app = express();
+// const PORT = 3005;
+
+// const cors = require('cors');
+
+// app.use(cors({
+//   origin: 'http://localhost:5173',
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+//   credentials: true
+// }));
+
+// //app.options('*', cors());
+
+// //---------------root--------------//
+
+// app.get('/', (req, res) => {
+//   res.end('Gateway is running')
+// });
+
+// // --------------------Health-----------------//
+
+// app.get('/health', (req, res) => {
+//   res.json({status: 'ok'});
+// });
+
+// // ----------------------Proxy routes-------------------//
+
+// app.use('/api/auth', createProxyMiddleware({
+//   target: 'http://auth-service:3000',
+//   changeOrigin: true,
+//   pathRewrite: { '^/api/auth': ''}
+// }));
+
+// app.use('/api/user', createProxyMiddleware({
+//   target: 'http://user-service:3000',
+//   changeOrigin: true,
+//   pathRewrite: {'^/api/user': ''}
+// }));
+
+
+// app.use('/api/game', createProxyMiddleware({
+//   target: 'http://game-service:3000',
+//   changeOrigin: true,
+//   pathRewrite: {'^/api/game': ''}
+// }));
+
+// //------------------------ Start server-----------------------//
+
+// app.use((req, res) => 
+// {
+//   res.status(404).send('Not found');
+// });
+
+// app.listen(PORT, '0.0.0.0', () => {
+//   console.log(`Gateway running on port ${PORT}`);
+// });
+
+
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const cors = require('cors');
 
 const app = express();
 const PORT = 3005;
-
-//for test endpoint
-const cors = require('cors');
 
 app.use(cors({
   origin: 'http://localhost:5173',
@@ -14,61 +74,51 @@ app.use(cors({
   credentials: true
 }));
 
-app.options('*', cors());
-
-// Root
-app.get(['/', '/index.html'], (req, res) => {
-  res.send('Gateway is running. Use /auth, /user, /game');
+// Логирование всех запросов ← НОВАЯ СТРОКА!
+app.use((req, res, next) => {
+  console.log(`[GATEWAY] ${req.method} ${req.url}`);
+  next();
 });
 
-// Health
+app.get('/', (req, res) => {
+  res.end('Gateway is running');
+});
+
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+  res.json({status: 'ok'});
 });
 
-// Proxy routes
-
-// app.use('/auth', createProxyMiddleware({
-//   target: 'http://auth-service:3000',
-//   changeOrigin: true,
-//   pathRewrite: { '^/auth': '' }
-// }));
-
-app.use('/user', createProxyMiddleware({
-  target: 'http://user-service:3000',
-  changeOrigin: true,
-  pathRewrite: { '^/user': '' }
-}));
-
-app.use('/game', createProxyMiddleware({
-  target: 'http://game-service:3000',
-  changeOrigin: true,
-  pathRewrite: { '^/game': '' }
-}));
-
-app.use('/status', createProxyMiddleware({
-  target: 'http://status-page:3000',
-  changeOrigin: true
-}));
-
-
-// Start server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log('Gateway running on port 3005');
-});
-
-
-/// Inga's test endpoint
-app.use('/api/auth', createProxyMiddleware({
+app.use('/auth', createProxyMiddleware({
   target: 'http://auth-service:3000',
   changeOrigin: true,
-  pathRewrite: {
-    '^/api/auth': ''
+  pathRewrite: { '^/auth': '' },
+  on: {
+    proxyReq: (proxyReq, req) => {
+      console.log(`[PROXY] ${req.method} ${req.url} → ${proxyReq.path}`);
+    },
+    error: (err, req, res) => {
+      console.log(`[PROXY ERROR] ${err.message}`);
+      res.status(502).json({ error: 'Proxy error' });
+    }
   }
-  
 }));
 
-// 404 fallback
+app.use('/api/user', createProxyMiddleware({
+  target: 'http://user-service:3000',
+  changeOrigin: true,
+  pathRewrite: {'^/api/user': ''}
+}));
+
+app.use('/api/game', createProxyMiddleware({
+  target: 'http://game-service:3000',
+  changeOrigin: true,
+  pathRewrite: {'^/api/game': ''}
+}));
+
 app.use((req, res) => {
-  res.status(404).send('Not Found');
+  res.status(404).json({ error: 'Not found' });
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Gateway running on port ${PORT}`);
 });
