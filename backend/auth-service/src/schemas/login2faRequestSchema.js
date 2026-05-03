@@ -1,12 +1,12 @@
-const login2faRequestSchema = 
-{
-    $id: "auth.login2faRequest",
-    type:  "object",
-    required: ["code", "userId"],
-    properties: {
-        code: {type: "string", minLength: 6, maxLength: 6},
-        userId: {type: "integer", minimum: 1}
-    },
-    additionalProperties: false
+const login2faRequestSchema = {
+  $id: "auth.login2faRequest",
+  type: "object",
+  required: ["loginTicket", "otp"],
+  properties: {
+    loginTicket: { type: "string", format: "uuid" },
+    otp: { type: "string", pattern: "^[0-9]{6}$" }
+  },
+  additionalProperties: false
 }
+
 module.exports = login2faRequestSchema;

@@ -2,9 +2,9 @@ const login2faEnableResponseSchema =
 {
     $id: "auth.login2faEnableResponse",
     type:  "object",
-    required: ["otpauthUrl ", "qrSvg"],
+    required: ["otpauthUrl", "qrSvg"],
     properties: {
-        otpauthUrl : {type: "string", format: "uri"},
+        otpauthURL: {type: "string", format: "uri"},
         qrSvg: {type: "string"}
     },
     additionalProperties: false

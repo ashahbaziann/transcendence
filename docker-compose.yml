@@ -46,9 +46,9 @@ services:
       - ./backend/auth-service/.env
     ports:
       - "3001:3000"
-    volumes:
-      - ./backend/auth-service:/app    # ← добавить эту строку
-      - /app/node_modules
+    # volumes:
+    #   - ./backend/auth-service:/app    # ← добавить эту строку
+    #   - /app/node_modules
     networks:
       - transcendence-net
 
@@ -56,6 +56,8 @@ services:
   user-service:
     container_name: user-service
     build: ./backend/user-service
+    environment:
+    - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     ports:
       - "3002:3000"
     networks:
@@ -70,15 +72,6 @@ services:
     networks:
       - transcendence-net
   
-
-  game-standalone:
-    container_name: game-standalone
-    build: ./backend/game-standalone
-    ports:
-      - "3010:3010"
-    networks:
-      - transcendence-net
-
   # Health system
   service-checker:
     container_name: service-checker

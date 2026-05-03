@@ -15,11 +15,12 @@ clientProm.collectDefaultMetrics({ register });
 
 // PostgreSQL client
 const client = new Client({
-  host: 'postgres',
-  user: 'user',
-  password: 'pass',
-  database: 'transcendence',
-  port: 5432
+  // host: 'postgres',
+  // user: 'user',
+  // password: 'pass',
+  // database: 'transcendence',
+  // port: 5432
+  connectionString: process.env.DATABASE_URL
 });
 
 client.connect()

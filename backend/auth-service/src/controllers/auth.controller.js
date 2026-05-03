@@ -51,6 +51,7 @@ async function login(req, res) {
     if (errors) {
     return res.status(400).json({ error: 'Validation failed', details: errors });
     }
+
     const user = await prisma.localAccount.findUnique({ where: { email } });
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -60,6 +61,21 @@ async function login(req, res) {
     if (!valid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+
+    const twofa = await prisma.twoFactorSecret.findUnique({
+      where: { userId: user.userId }
+    });
+    if (twofa && twofa.isVerified){
+      const ticket = await prisma.twoFactorTicket.create({
+        data: {
+          id: require('crypto').randomUUID(),
+          userId: user.userId,
+          expireTime: new Date(Date.now() + 5 * 60 * 1000)
+        }
+      });
+      return res.json( { requires2fa: true, loginTicket: ticket.id});
+    }
+    
 
     const token = jwt.sign(
       { userId: user.userId, email: user.email },
@@ -73,6 +89,7 @@ async function login(req, res) {
     res.status(500).json({ error: 'Internal server error' });
   }
 }
+
 
 async function logout(req, res){
   try{
