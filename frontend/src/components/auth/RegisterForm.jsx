@@ -11,10 +11,17 @@ async function registerUser(data) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    // throw backend error so catch() runs
+    throw result;
   }
-);
-return response.json();
-}
+
+  return result;
+} 
 
 export default function RegisterForm() {
   const navigate = useNavigate();
@@ -32,17 +39,18 @@ export default function RegisterForm() {
 
   // handle form submit
   const handleSubmit = async (e) => {
-    e.preventDefault(); // prevent page refresh
+    e.preventDefault();
 
     try {
-      const res = await registerUser(form); // call backend
-      console.log("Response:", res); // for now just log
-      alert("Registered successfully!"); // simple feedback
+      const res = await registerUser(form);
 
-      //navigate("/game");
+      console.log("Success:", res);
+      alert(res.message || "Registered successfully!");
+
+      // navigate("/game");
     } catch (err) {
       console.error("Error:", err);
-      alert("Registration failed!");
+      alert(err.error || "Registration failed!");
     }
   };
 

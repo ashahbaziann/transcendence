@@ -17,6 +17,12 @@ router.get('/oauth/42/callback',
     oauthCallback
 );
 
+// Inga change - start
+router.get('/me', authMiddleware, (req, res) => {
+  res.json(req.user);
+});
+// Inga change - start
+
 
 // 2FA
 router.get('/2fa/enable', authMiddleware, enable2fa);
