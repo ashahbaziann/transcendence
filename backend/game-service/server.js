@@ -1,99 +1,78 @@
-const express = require('express');
-const { Client } = require('pg');
-const clientProm = require('prom-client');
+//import fastify from "fastify"
+//import fastifyWebsocket from "@fastify/websocket"
+//import {gameManager} from "./game_manager.js"
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-const SERVICE_NAME = 'game-service';
+import { createServer }           from 'http';
+import { WebSocketServer }        from 'ws';
+import { gameManager }            from './game_manager.js';
+import { startgame, stopgame }    from './gameLoop.js';
 
-// Middleware to parse JSON bodies
-app.use(express.json());
+const server = createServer()
 
-// Prometheus setup
-const register = new clientProm.Registry();
-clientProm.collectDefaultMetrics({ register });
+const wss = new WebSocketServer({server})
 
-// PostgreSQL client
-const client = new Client({
-  host: 'postgres',
-  user: 'user',
-  password: 'pass',
-  database: 'transcendence',
-  port: 5432
-});
+let waitingplayer = null
 
-client.connect()
-  .then(() => console.log("DB connected"))
-  .catch(err => console.error("DB connection error:", err));
+let nextroomID = 1
 
-// Create table if not exists
-client.query(`
-  CREATE TABLE IF NOT EXISTS games (
-    id SERIAL PRIMARY KEY,
-    player1 VARCHAR(50),
-    player2 VARCHAR(50),
-    status VARCHAR(20)
-  );
-`).catch(err => console.error(err));
+wss.on('connection', (ws) => {
 
-
-// Routes
-
-// Health
-app.get('/health', (req, res) => {
-  res.json({ status: `${SERVICE_NAME} running` });
-});
-
-// Root
-app.get('/', (req, res) => {
-  res.send(`${SERVICE_NAME} is working!`);
-});
-
-// Metrics
-app.get('/metrics', async (req, res) => {
-  res.set('Content-Type', register.contentType);
-  res.end(await register.metrics());
-});
-
-// POST /games
-app.post('/games', async (req, res) => {
-  try {
-    const { player1, player2, status } = req.body;
-
-    if (!player1 || !player2 || !status) {
-      return res.status(400).json({ error: "Missing fields" });
+    if(waitingplayer === null)
+    {
+        waitingplayer = ws
+        ws.send(JSON.stringify({type : 'waiting'}))
     }
 
-    await client.query(
-      'INSERT INTO games (player1, player2, status) VALUES ($1, $2, $3)',
-      [player1, player2, status]
-    );
+    else
+    {
+        const roomID = nextroomID++
+        const room = gameManager.createroom(roomID)
 
-    res.json({ message: "Game added" });
+        gameManager.addplayer(roomID,waitingplayer)
+        gameManager.addplayer(roomID,ws)
 
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+        room.players[0].ws.send(JSON.stringify({type: 'role', side: 'left' }))
+        room.players[1].ws.send(JSON.stringify({type: 'role', side: 'right' }))
+
+        waitingplayer = null
+
+        startgame(room)
+    }
+    ws.on('message', (data) =>{
+    
+        const msg=JSON.parse(data)
+        console.log("Received Key:", msg.key, "Pressed:", msg.pressed);
+    
+        const room=gameManager.getroombyWS(ws)
+        if(!room)
+            return
+    
+        if(msg.type === 'key')
+            room.keys[msg.key]=msg.pressed
+    });
+    
+    ws.on('close', () =>{
+    
+        if(waitingplayer === ws)
+        {
+            waitingplayer=null
+            return
+        }
+    
+        const room =gameManager.getroombyWS(ws)
+        if(!room)
+            return
+    
+        stopgame(room)
+       
+        const opponent = gameManager.getopponent(room, ws)
+        if(opponent && opponent.ws.readyState == 1 )
+            opponent.ws.send(JSON.stringify({type: 'opponent_disconnected'}))
+    
+        gameManager.deleteid(room.id)
+    });
 });
 
-// GET /games
-app.get('/games', async (req, res) => {
-  try {
-    const result = await client.query(
-      'SELECT * FROM games ORDER BY id ASC'
-    );
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 404 fallback
-app.use((req, res) => {
-  res.status(404).send();
-});
-
-// Start server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`${SERVICE_NAME} running on port ${PORT}`);
+server.listen(3000, () => {
+    console.log('server running on port 3000');
 });

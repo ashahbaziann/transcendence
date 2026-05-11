@@ -1,0 +1,23 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Game {
+  id          String    @id @default(cuid())
+  roomId      Int       @unique
+  winnerId    Int?
+  loserId     Int?
+  winnerScore Int       @default(0)
+  loserScore  Int       @default(0)
+  duration    Int?
+  status      String    @default("waiting")
+  createdAt   DateTime  @default(now())
+  endedAt     DateTime?
+
+  @@map("games")
+}
