@@ -1,6 +1,6 @@
 NAME = transcendence
 
-all: up
+all: up migrate
 
 up:
 	docker compose up -d --build
@@ -8,13 +8,24 @@ up:
 down:
 	docker compose down
 
-re: down up
+re: down up migrate
 
 stop:
 	docker compose stop
 
 start:
 	docker compose start
+
+migrate:
+	@echo "Waiting for postgres to be ready..."
+	@sleep 3
+	docker exec auth-service npx prisma db push --force-reset
+
+logs:
+	docker compose logs --follow
+
+ps:
+	docker compose ps
 
 clean: down
 	docker compose rm -f
@@ -23,13 +34,10 @@ clean: down
 fclean: clean
 	docker system prune -af
 
-logs:
-	docker compose logs --follow
-
-ps:
-	docker compose ps
-
-.PHONY: all up down re stop start clean fclean logs ps
+nuke:
+	docker stop $(shell docker ps -aq) 2>/dev/null || true
+	docker rm $(shell docker ps -aq) 2>/dev/null || true
+	docker system prune -af
 
 backup:
 	@bash backups/scripts/backup.sh
@@ -37,4 +45,6 @@ backup:
 restore:
 	@echo "Usage: make restore FILE=backups/dumps/backup_YYYY-MM-DD_HH-MM-SS.sql"
 	@test -n "$(FILE)" || exit 1
-	docker exec -i postgres psql -U ${POSTGRES_USER:-user} ${POSTGRES_DB:-transcendence} < $(FILE)
+	docker exec -i postgres psql -U ${POSTGRES_USER:-admin} ${POSTGRES_DB:-transcendence} < $(FILE)
+
+.PHONY: all up down re stop start clean fclean logs ps migrate nuke backup restore
