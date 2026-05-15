@@ -18,8 +18,13 @@ start:
 
 migrate:
 	@echo "Waiting for postgres to be ready..."
-	@sleep 3
+	@until docker exec postgres pg_isready -U $${POSTGRES_USER:-admin} > /dev/null 2>&1; do \
+		echo "Postgres not ready, waiting..."; \
+		sleep 2; \
+	done
+	@echo "Postgres is ready!"
 	docker exec auth-service npx prisma db push --force-reset
+	docker compose restart user-service
 
 logs:
 	docker compose logs --follow

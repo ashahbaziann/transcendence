@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 // === РЕГИСТРАЦИЯ ===
 async function register(req, res) {
   try {
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;
     const errors = validate(registerRequestSchema, req.body);
     if(errors){
       return res.status(400).json({ error: 'Validation failed', details: errors });
@@ -27,6 +27,17 @@ async function register(req, res) {
         email,
         password: hashedPassword
       }
+    });
+
+     // Auto-create user profile in user-service
+    await fetch('http://user-service:3000/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: newUser.userId,
+        username: username,
+        email: newUser.email
+      })
     });
 
     res.status(201).json({
