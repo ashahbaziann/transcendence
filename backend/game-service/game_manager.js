@@ -5,8 +5,10 @@ const PADDLE_H = 90;
 export const gameManager={
     rooms: new Map(),
 
-    createroom(roomid)
+    createroom(roomid,settings = {})
     {
+        const speedmultiplier =settings.ballspeed || 1
+        const paddleSize = settings.paddleSize || PADDLE_H
         const newroom=
         {
             id: roomid,
@@ -15,10 +17,21 @@ export const gameManager={
             status: 'waiting',  // 'waiting' | 'playing' | 'gameover'
             // Game state — think of this as a struct inside your room struct
             gameState: {
-                ball: { x: W / 2, y: H / 2,vx: 4, vy: 3,speed: 4},
-                left:  { y: H / 2 - PADDLE_H / 2,score: 0},
-                right: {y: H / 2 - PADDLE_H / 2,score: 0},
+                ball: { x: W / 2, y: H / 2,
+                    vx: 4 * speedmultiplier, 
+                    vy: 3 * speedmultiplier,
+                    speed: 4 * speedmultiplier},
+                left:  { y: H / 2 - paddleSize/ 2,score: 0,height: paddleSize},
+                right: {y: H / 2 - paddleSize / 2,score: 0,height:paddleSize},
             },
+             settings: {
+                speedmultiplier,
+                paddleSize:   paddleSize,
+                winningScore: settings.winningScore || 5,
+                map:          settings.map          || 'classic',
+                powerUps:     settings.powerUps     || false
+            },
+            powerUps: [],
             keys: {
             w:         false,
             s:         false,
@@ -90,27 +103,26 @@ export const gameManager={
     {
         const room = this.rooms.get(roomId)
         if(!room)
-         return null
+            return null
+        const setin = room.settings
 
         room.gameState.ball.x =W / 2
         room.gameState.ball.y =H / 2
-        room.gameState.ball.vx =4
-        room.gameState.ball.vy =3
-        room.gameState.ball.speed =4
+        room.gameState.ball.vx =4 * setin.speedmultiplier
+        room.gameState.ball.vy =3 * setin.speedmultiplier
+        room.gameState.ball.speed =4 * setin.speedmultiplier
 
-        room.gameState.left.y=H / 2 - PADDLE_H / 2
+        room.gameState.left.y=H / 2 - setin.paddleSize/ 2
         room.gameState.left.score=0
-        room.gameState.left.upKey=false
-        room.gameState.left.downKey=false
-
-        room.gameState.right.y=H / 2 - PADDLE_H / 2
+        room.gameState.left.height=setin.paddleSize
+        
+        room.gameState.right.y=H / 2 - setin.paddleSize/ 2
         room.gameState.right.score=0
-        room.gameState.right.upKey=false
-        room.gameState.right.downKey=false
-
-
+        room.gameState.right.height=setin.paddleSize
+        
         room.status = 'waiting'
         room.time = new Date()
+        room.powerUps = []
 
         return room
 
