@@ -94,6 +94,23 @@ async function login(req, res) {
       { expiresIn: '24h' }
     );
 
+      // Set user online
+    await fetch('http://user-service:3000/users/status', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: user.userId, online: true })
+    });
+    // Set user online
+    try {
+      const r = await fetch('http://user-service:3000/users/status', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.userId, online: true })
+      });
+      console.log('Online status update:', await r.json());
+    } catch (e) {
+      console.error('Failed to update online status:', e.message);
+    }
     res.json({ message: 'Login successful', token });
   } catch (err) {
     console.error(err);
@@ -104,6 +121,12 @@ async function login(req, res) {
 
 async function logout(req, res){
   try{
+        // Set user offline
+    await fetch('http://user-service:3000/users/status', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: req.user.userId, online: false })
+    });
     res.status(200).json({message: 'Logout successful'});
   } catch (err){
     console.error(err);

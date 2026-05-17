@@ -26,14 +26,28 @@ pool.query(`
     user_id INT UNIQUE NOT NULL,
     username TEXT UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    avatar TEXT DEFAULT NULL,
+    avatar TEXT DEFAULT 'https://api.dicebear.com/7.x/identicon/svg?seed=default',
     wins INT DEFAULT 0,
     losses INT DEFAULT 0,
     draws INT DEFAULT 0,
+    online BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT NOW()
   )
 `).then(() => console.log("DB connected and table ready"))
   .catch(err => console.error("DB error:", err));
+
+
+
+pool.query(`
+  CREATE TABLE IF NOT EXISTS friends (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    friend_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE(user_id, friend_id)
+  )
+`).catch(err => console.error("Friends table error:", err));
+
 
 // JWT Middleware
 function authMiddleware(req, res, next) {
@@ -47,6 +61,36 @@ function authMiddleware(req, res, next) {
     res.status(401).json({ error: 'Invalid token' });
   }
 }
+
+
+
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Multer setup
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = '/app/uploads';
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${req.params.id}${path.extname(file.originalname)}`);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB max
+  fileFilter: (req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowed.includes(file.mimetype)) cb(null, true);
+    else cb(new Error('Only images allowed'));
+  }
+});
+
+const DEFAULT_AVATAR = 'https://api.dicebear.com/7.x/identicon/svg?seed=default';
 
 // Routes
 
@@ -99,6 +143,22 @@ app.get('/users/:id', authMiddleware, async (req, res) => {
   }
 });
 
+
+// PUT /users/status - update online status (internal only)
+app.put('/users/status', async (req, res) => {
+  try {
+    const { user_id, online } = req.body;
+    await pool.query(
+      'UPDATE users SET online = $1 WHERE user_id = $2',
+      [online, user_id]
+    );
+    res.json({ message: 'Status updated' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // PUT /users/:id - update profile (protected, own profile only)
 app.put('/users/:id', authMiddleware, async (req, res) => {
   try {
@@ -122,6 +182,81 @@ app.get('/users/:id/stats', authMiddleware, async (req, res) => {
     if (result.rows.length === 0)
       return res.status(404).json({ error: 'User not found' });
     res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /users/:id/avatar - upload avatar
+app.post('/users/:id/avatar', authMiddleware, upload.single('avatar'), async (req, res) => {
+  try {
+    if (req.user.userId !== parseInt(req.params.id))
+      return res.status(403).json({ error: 'Forbidden' });
+    if (!req.file)
+      return res.status(400).json({ error: 'No file uploaded' });
+    const avatarUrl = `/avatars/${req.file.filename}`;
+    const result = await pool.query(
+      'UPDATE users SET avatar = $1 WHERE user_id = $2 RETURNING *',
+      [avatarUrl, req.params.id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Serve uploaded avatars
+app.use('/avatars', express.static('/app/uploads'));
+
+
+
+// POST /users/:id/friends/:friendId - add friend
+app.post('/users/:id/friends/:friendId', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.userId !== parseInt(req.params.id))
+      return res.status(403).json({ error: 'Forbidden' });
+    if (req.params.id === req.params.friendId)
+      return res.status(400).json({ error: 'Cannot add yourself as friend' });
+    const friend = await pool.query('SELECT * FROM users WHERE user_id = $1', [req.params.friendId]);
+    if (friend.rows.length === 0)
+      return res.status(404).json({ error: 'User not found' });
+    await pool.query(
+      'INSERT INTO friends (user_id, friend_id) VALUES ($1, $2)',
+      [req.params.id, req.params.friendId]
+    );
+    res.status(201).json({ message: 'Friend added' });
+  } catch (err) {
+    if (err.code === '23505')
+      return res.status(409).json({ error: 'Already friends' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /users/:id/friends - get friend list
+app.get('/users/:id/friends', authMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT u.user_id, u.username, u.avatar, u.online
+      FROM friends f
+      JOIN users u ON u.user_id = f.friend_id
+      WHERE f.user_id = $1
+    `, [req.params.id]);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /users/:id/friends/:friendId - remove friend
+app.delete('/users/:id/friends/:friendId', authMiddleware, async (req, res) => {
+  try {
+    if (req.user.userId !== parseInt(req.params.id))
+      return res.status(403).json({ error: 'Forbidden' });
+    await pool.query(
+      'DELETE FROM friends WHERE user_id = $1 AND friend_id = $2',
+      [req.params.id, req.params.friendId]
+    );
+    res.json({ message: 'Friend removed' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

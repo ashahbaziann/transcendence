@@ -60,6 +60,8 @@ services:
       - JWT_SECRET=${JWT_SECRET}
     ports:
       - "3002:3000"
+    volumes:
+      - avatars_data:/app/uploads
     networks:
       - transcendence-net
 
@@ -149,3 +151,4 @@ networks:
 volumes:
   postgres_data:
   grafana_data:
+  avatars_data:
