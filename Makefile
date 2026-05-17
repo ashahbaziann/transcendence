@@ -24,6 +24,7 @@ migrate:
 	done
 	@echo "Postgres is ready!"
 	docker exec auth-service npx prisma db push --force-reset
+	docker exec game-service npx prisma migrate deploy
 	docker compose restart user-service
 
 logs:

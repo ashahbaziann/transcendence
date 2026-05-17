@@ -8,8 +8,18 @@ import { WebSocketServer }        from 'ws';
 import { gameManager }            from './game_manager.js';
 import { startgame, stopgame }    from './gameLoop.js';
 import { validateToken}           from './auth.js';
-const server = createServer()
+import { register, collectDefaultMetrics } from 'prom-client';
+collectDefaultMetrics({ register });
 
+const server = createServer(async (req, res) => {
+  if (req.method === 'GET' && req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'game-service running' }));
+  } else if (req.method === 'GET' && req.url === '/metrics') {
+    res.writeHead(200, { 'Content-Type': register.contentType });
+    res.end(await register.metrics());
+  }
+});
 const wss = new WebSocketServer({server})
 
 let waitingplayer = null

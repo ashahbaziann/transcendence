@@ -8,6 +8,10 @@ COPY package*.json ./
 # Install dependencies inside container
 RUN npm install
 
+
+COPY prisma ./prisma
+
+RUN npx prisma generate
 # Copy all code
 COPY . .
 
