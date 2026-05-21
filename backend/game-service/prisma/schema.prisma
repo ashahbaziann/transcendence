@@ -9,7 +9,7 @@ generator client {
 
 model Game {
   id          String    @id @default(cuid())
-  roomId      Int       @unique
+  roomId      BigInt    @unique
   winnerId    Int?
   loserId     Int?
   winnerScore Int       @default(0)

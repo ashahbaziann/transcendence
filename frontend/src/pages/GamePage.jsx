@@ -1,119 +1,116 @@
 import { useEffect } from "react";
-
+import { useLocation, useNavigate } from "react-router-dom";
 import GameCanvas from "../components/game/GameCanvas";
-import GameHUD from "../components/game/GameHUD";
-import { useGameState } from "../components/game/useGameState";
+import GameHUD    from "../components/game/GameHUD";
+import { useGameState }  from "../components/game/useGameState";
 import { useGameSocket } from "../components/game/useGameSocket";
-import { useGameInput } from "../components/game/useGameInput";
 
-const USE_MOCK = false;
-
-/* ---------------- MOCK SOCKET ---------------- */
-function useMockSocket(onMessage) {
-  useEffect(() => {
-    console.log("MOCK SERVER STARTED");
-
-    // waiting
-    setTimeout(() => {
-      onMessage({ type: "waiting" });
-    }, 500);
-
-    // role
-    setTimeout(() => {
-      onMessage({ type: "role", side: "left" });
-    }, 1500);
-
-    // countdown
-    let count = 3;
-
-    const countdownInterval = setInterval(() => {
-      if (count > 0) {
-        onMessage({ type: "countdown", value: count });
-        count--;
-      } else {
-        clearInterval(countdownInterval);
-        startGameLoop();
-      }
-    }, 1000);
-
-    function startGameLoop() {
-      let ball = { x: 400, y: 250, vx: 3, vy: 2 };
-      let left = { y: 200, score: 0 };
-      let right = { y: 200, score: 0 };
-
-      setInterval(() => {
-        // physics
-        ball.x += ball.vx;
-        ball.y += ball.vy;
-
-        if (ball.y <= 0 || ball.y >= 500) {
-          ball.vy *= -1;
-        }
-
-        // right score
-        if (ball.x < 0) {
-          right.score++;
-          ball = { x: 400, y: 250, vx: 3, vy: 2 };
-        }
-
-        // left score
-        if (ball.x > 800) {
-          left.score++;
-          ball = { x: 400, y: 250, vx: -3, vy: 2 };
-        }
-
-        onMessage({
-          type: "state",
-          payload: { ball, left, right },
-        });
-
-        // game over
-        if (left.score === 5 || right.score === 5) {
-          onMessage({
-            type: "gameover",
-            winner: left.score > right.score ? "left" : "right",
-          });
-        }
-      }, 1000 / 60);
-    }
-  }, [onMessage]);
-}
-
-/* ---------------- GAME PAGE ---------------- */
 export default function GamePage() {
+  const location = useLocation();
+  const navigate  = useNavigate();
+
+  const {
+    mode          = "local",
+    opponentToken = null,
+    settings      = {},
+  } = location.state || {};
+
+  const isLocal = mode === "local" || mode === "friend";
+
   const {
     gameStatus,
-    side,
+    side1,
     gameState,
+    powerUps,
     countdown,
     winner,
-    handleMessage,
+    error,
+    reset,
+    handleMessage1,
+    handleMessage2,
   } = useGameState();
 
-  // ALWAYS define send safely
-  let send = () => {};
+  const { send: send1, isReady: ready1, reconnect: reconnect1 } = useGameSocket(handleMessage1, true, null);
+  const { send: send2, reconnect: reconnect2 }                  = useGameSocket(handleMessage2, isLocal, opponentToken);
 
-  // choose mock or real socket
-  if (USE_MOCK) {
-    useMockSocket(handleMessage);
-  } else {
-    const socket = useGameSocket(handleMessage);
-    send = socket.send;
+  // Send settings the moment socket1 is open
+  useEffect(() => {
+    if (!ready1) return;
+    send1({
+      type:         "settings",
+      powerUps:     settings.powerUps  ?? false,
+      winningScore: settings.winScore  ?? 5,
+      bgTheme:      settings.bgTheme   ?? "classic",
+    });
+  }, [ready1]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Key input
+  useEffect(() => {
+    if (gameStatus !== "playing") return;
+
+    function handleKey(e, pressed) {
+      if (e.key === "w" || e.key === "s") {
+        e.preventDefault();
+        send1({ type: "key", key: e.key, pressed });
+      }
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        e.preventDefault();
+        isLocal
+          ? send2({ type: "key", key: e.key, pressed })
+          : send1({ type: "key", key: e.key, pressed });
+      }
+    }
+
+    const down = (e) => handleKey(e, true);
+    const up   = (e) => handleKey(e, false);
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup",   up);
+    return () => {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup",   up);
+    };
+  }, [gameStatus, send1, send2, isLocal]);
+
+  function handlePlayAgain() {
+    reset();       // clear all game state
+    reconnect1();  // close socket1 and open a fresh one
+    reconnect2();  // close socket2 and open a fresh one
+    // no navigation — stays on /game, sockets reconnect, server pairs them fresh
   }
 
-  // input system (only active in gameplay)
-  useGameInput({ send }, gameStatus === "playing");
+  const bgColor = {
+    classic: "#111111",
+    ocean:   "#0a1628",
+    forest:  "#0d1f0f",
+    dusk:    "#1a0a1f",
+  }[settings.bgTheme || "classic"] || "#111111";
 
   return (
-    <div style={{ background: "#111", height: "100vh" }}>
+    <div style={{
+      background: bgColor,
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      fontFamily: "'Inter', system-ui, sans-serif",
+      position: "relative",
+    }}>
       <GameHUD
         status={gameStatus}
-        side={side}
+        side={side1}
         countdown={countdown}
         winner={winner}
+        error={error}
+        isLocal={isLocal}
+        onPlayAgain={handlePlayAgain}
+        onGoHome={() => navigate("/home")}
       />
-
-      <GameCanvas gameState={gameState} />
+      <GameCanvas
+        gameState={gameState}
+        powerUps={powerUps}
+        bgColor={bgColor}
+      />
     </div>
   );
 }

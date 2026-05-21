@@ -1,16 +1,32 @@
 import { useEffect } from "react";
 
-export function useGameInput({ send }, enabled) {
+export function useGameInput({ send, side }, enabled) {
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || !side) return;
 
     function handleKey(e, pressed) {
       const keys = ["w", "s", "ArrowUp", "ArrowDown"];
       if (!keys.includes(e.key)) return;
+      e.preventDefault();
+
+      const keyMap = {
+        left: {
+          w: "w",
+          ArrowUp: "w",
+          s: "s",
+          ArrowDown: "s",
+        },
+        right: {
+          w: "ArrowUp",
+          ArrowUp: "ArrowUp",
+          s: "ArrowDown",
+          ArrowDown: "ArrowDown",
+        },
+      };
 
       send({
         type: "key",
-        key: e.key,
+        key: keyMap[side][e.key],
         pressed,
       });
     }
@@ -25,5 +41,5 @@ export function useGameInput({ send }, enabled) {
       window.removeEventListener("keydown", keyDown);
       window.removeEventListener("keyup", keyUp);
     };
-  }, [send, enabled]);
+  }, [send, side, enabled]);
 }

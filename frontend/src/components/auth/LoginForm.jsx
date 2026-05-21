@@ -16,23 +16,23 @@ import styles from "./AuthForm.module.css";
 //   return response.json();
 // }
 
-async function loginUser(data) {
-  const response = await fetch("http://localhost:3005/auth/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+// async function loginUser(data) {
+//   const response = await fetch("http://localhost:3005/auth/login", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(data),
+//   });
 
-  const resData = await response.json();
+//   const resData = await response.json();
 
-  return {
-    ok: response.ok,
-    status: response.status,
-    data: resData,
-  };
-}
+//   return {
+//     ok: response.ok,
+//     status: response.status,
+//     data: resData,
+//   };
+// }
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ export default function LoginForm() {
   };
 
   async function loginUser(data) {
-    const response = await fetch("http://localhost:3005/auth/login", {
+    const response = await fetch("/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export default function LoginForm() {
       await login(res.data.token);
 
       alert("Logged in successfully!");
-      navigate("/game");
+      navigate("/home");
 
     } catch (err) {
       console.error("Error:", err);

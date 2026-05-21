@@ -17,4 +17,8 @@ COPY . .
 
 EXPOSE 3000
 
+
+#Inga added
+RUN npx prisma generate
+
 CMD ["node", "server.js"]
