@@ -1,0 +1,182 @@
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+  min-width: 300px;
+  animation: popIn 0.6s ease-out;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255,255,255,0.2);
+}
+
+.username {
+  color: white;
+  font-size: 22px;
+  margin: 0;
+}
+
+.email {
+  color: rgba(255,255,255,0.5);
+  font-size: 14px;
+  margin: 0;
+}
+
+.stats {
+  display: flex;
+  gap: 20px;
+  margin: 10px 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statValue {
+  color: #60a5fa;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.statLabel {
+  color: rgba(255,255,255,0.5);
+  font-size: 12px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: white;
+  outline: none;
+  text-align: center;
+  font-size: 18px;
+}
+
+.input:focus {
+  border-color: #60a5fa;
+}
+
+.fileInput {
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+}
+
+.uploadWrapper {
+  width: 100%;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #3b82f6;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.button:hover {
+  background: #2563eb;
+}
+
+.buttonSecondary {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  background: transparent;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.buttonSecondary:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.buttonDanger {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #ef4444;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.buttonDanger:hover {
+  background: #dc2626;
+}
+
+.error {
+  color: #f87171;
+  font-size: 13px;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.backButton {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.6);
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.backButton:hover {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.fileLabel {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.fileLabel:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.fileInput {
+  display: none;
+}

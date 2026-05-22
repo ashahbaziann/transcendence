@@ -31,6 +31,7 @@ import { Routes, Route } from 'react-router-dom';
 import LandingPage   from './pages/LandingPage';
 import HomePage      from './pages/HomePage';
 import GamePage      from './pages/GamePage';
+import ProfilePage from "./pages/ProfilePage";
 import CallbackPage  from './pages/CallBack';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
@@ -57,6 +58,16 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      
     </Routes>
   );
 }
