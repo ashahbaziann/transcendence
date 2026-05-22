@@ -29,16 +29,29 @@ async function register(req, res) {
       }
     });
 
-     // Auto-create user profile in user-service
-    await fetch('http://user-service:3000/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: newUser.userId,
-        username: username,
-        email: newUser.email
-      })
-    });
+    //  // Auto-create user profile in user-service
+    // await fetch('http://user-service:3000/users', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({
+    //     user_id: newUser.userId,
+    //     username: username,
+    //     email: newUser.email
+    //   })
+    // });
+
+      const userServiceRes = await fetch('http://user-service:3000/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      user_id: newUser.userId,
+      username: username,
+      email: newUser.email
+    })
+  });
+  if (!userServiceRes.ok) {
+    console.error('Failed to create user profile:', await userServiceRes.text());
+  }
 
     res.status(201).json({
       message: 'User registered successfully',
@@ -94,12 +107,6 @@ async function login(req, res) {
       { expiresIn: '24h' }
     );
 
-      // Set user online
-    await fetch('http://user-service:3000/users/status', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: user.userId, online: true })
-    });
     // Set user online
     try {
       const r = await fetch('http://user-service:3000/users/status', {

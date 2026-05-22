@@ -1,16 +1,8 @@
 FROM node:22
-
 WORKDIR /app
-
-# Copy package files first (for caching)
 COPY package*.json ./
-
-# Install dependencies inside container
 RUN npm install
-
-# Copy all code
 COPY . .
-
+RUN npx prisma generate
 EXPOSE 3000
-
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "npx prisma db push && node server.js"]

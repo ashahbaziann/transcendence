@@ -14,7 +14,9 @@ export default function ProfileCard({ profile, userId, onLogout }) {
 
   const avatarUrl = avatarPreview ||
     (profile?.avatar
-      ? `http://localhost:3002${profile.avatar}`
+      ? profile.avatar.startsWith('http')
+        ? profile.avatar
+        : `http://localhost:3002${profile.avatar}`
       : `https://api.dicebear.com/7.x/identicon/svg?seed=${profile?.username}`);
 
   const handleAvatarChange = (e) => {
@@ -44,10 +46,15 @@ export default function ProfileCard({ profile, userId, onLogout }) {
           body: formData
         });
         if (!res.ok) {
-          const data = await res.json();
-          setError(data.error || "Avatar upload failed");
-          return;
-        }
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    data = { error: `HTTP ${res.status}: ${res.statusText}` };
+  }
+  setError(data.error || "Avatar upload failed");
+  return;
+}
       }
 
       if (username !== profile?.username) {

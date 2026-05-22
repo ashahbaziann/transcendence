@@ -8,7 +8,18 @@ const PORT = process.env.PORT || 3000;
 const SERVICE_NAME = 'user-service';
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const cors = require('cors');
+
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://localhost:8443', 'http://localhost:8080'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+
 app.use(express.json());
+
 
 // Prometheus setup
 const register = new clientProm.Registry();
