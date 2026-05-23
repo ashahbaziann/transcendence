@@ -37,17 +37,33 @@ export default function RegisterForm() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // handle form submit
-  const handleSubmit = async (e) => {
+  // // handle form submit
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const res = await registerUser(form);
+
+  //     console.log("Success:", res);
+  //     alert(res.message || "Registered successfully!");
+
+  //     // navigate("/game");
+  //   } catch (err) {
+  //     console.error("Error:", err);
+  //     alert(err.error || "Registration failed!");
+  //   }
+  // };
+
+
+   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const res = await registerUser(form);
-
       console.log("Success:", res);
+      setForm({ username: "", email: "", password: "" }); // clear form
       alert(res.message || "Registered successfully!");
-
-      // navigate("/game");
+     // navigate("/login"); // redirect to login
     } catch (err) {
       console.error("Error:", err);
       alert(err.error || "Registration failed!");
