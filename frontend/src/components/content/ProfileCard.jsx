@@ -84,7 +84,7 @@ export default function ProfileCard({ profile, userId, onLogout }) {
 
   return (
     <div className={styles.card}>
-      <button className={styles.backButton} onClick={() => navigate("/")}>← Home</button>
+      <button className={styles.backButton} onClick={() => navigate("/home")}>← Home</button>
 
       <img src={avatarUrl} alt="avatar" className={styles.avatar} />
 

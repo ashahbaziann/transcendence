@@ -17,7 +17,7 @@ export default function CallbackPage() {
     if (token) {
               console.log("login() succeeded, navigating to /game");
 
-      login(token).then(() => navigate("/game"));
+      login(token).then(() => navigate("/home"));
     } else {
         console.error("login() threw:", err);
       navigate("/");

@@ -51,8 +51,10 @@ services:
     networks:
       - transcendence-net
     depends_on:
-      - postgres
-      - user-service
+      postgres:
+        condition: service_healthy
+      user-service:
+        condition: service_started
 
   # User service
   user-service:
@@ -67,6 +69,9 @@ services:
       - avatars_data:/app/uploads
     networks:
       - transcendence-net
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   # Game service
   game-service:
@@ -79,6 +84,9 @@ services:
       - "3003:3000"
     networks:
       - transcendence-net
+    depends_on:
+      postgres:
+        condition: service_healthy
   
   # Health system
   service-checker:
@@ -109,6 +117,12 @@ services:
       - ~/goinfre/postgres_data:/var/lib/postgresql/data
     networks:
       - transcendence-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   prometheus:
     container_name: prometheus
