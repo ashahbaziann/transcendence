@@ -23,9 +23,7 @@ migrate:
 		sleep 2; \
 	done
 	@echo "Postgres is ready!"
-	docker exec auth-service npx prisma db push --accept-data-loss || true
 	docker compose exec postgres sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -c "CREATE TABLE IF NOT EXISTS games (id TEXT PRIMARY KEY, \"roomId\" BIGINT UNIQUE, \"winnerId\" INT, \"loserId\" INT, \"winnerScore\" INT DEFAULT 0, \"loserScore\" INT DEFAULT 0, duration INT, status TEXT DEFAULT '\''waiting'\'', \"createdAt\" TIMESTAMP DEFAULT NOW(), \"endedAt\" TIMESTAMP);"'
-	docker compose restart user-service || true
 	@sleep 8
 	@echo "All done! Checking tables:"
 	docker compose exec postgres sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -c "\dt"'
