@@ -1,95 +1,147 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./AuthContext"; // make sure path is correct
+import { useAuth } from "./AuthContext";
 import styles from "./AuthForm.module.css";
-
-// function to handle API call
-// async function loginUser(data) {
-//   const response = await fetch("http://localhost:3005/auth/login", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify(data),
-//   }
-// );
-//   return response.json();
-// }
-
-// async function loginUser(data) {
-//   const response = await fetch("http://localhost:3005/auth/login", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify(data),
-//   });
-
-//   const resData = await response.json();
-
-//   return {
-//     ok: response.ok,
-//     status: response.status,
-//     data: resData,
-//   };
-// }
 
 export default function LoginForm() {
   const navigate = useNavigate();
-  const { login } = useAuth(); // ✅ correct place
+  const { login } = useAuth();
 
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+
+  // 2FA state
+  const [requires2fa, setRequires2fa] = useState(false);
+  const [loginTicket, setLoginTicket] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setError("");
   };
-
-  async function loginUser(data) {
-    const response = await fetch("/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    const resData = await response.json();
-
-    return {
-      ok: response.ok,
-      status: response.status,
-      data: resData,
-    };
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      const res = await loginUser(form);
+      const response = await fetch("/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await response.json();
 
-      if (!res.ok) {
-        alert(res.data.error || "Login failed");
+      if (!response.ok) {
+        setError(data.error || "Login failed");
         return;
       }
 
-      console.log("Token:", res.data.token);
+      // Backend requires 2FA
+      if (data.requires2fa && data.loginTicket) {
+        setLoginTicket(data.loginTicket);
+        setRequires2fa(true);
+        return;
+      }
 
-      // ✅ IMPORTANT: use context login (not just localStorage)
-      await login(res.data.token);
-
-      alert("Logged in successfully!");
+      // Normal login — got token directly
+      await login(data.token);
       navigate("/home");
 
     } catch (err) {
       console.error("Error:", err);
-      alert("Network error!");
+      setError("Network error!");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setOtpError("");
+
+    try {
+      const response = await fetch("/auth/2fa/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ loginTicket, otp }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setOtpError(data.error || "Invalid code");
+        return;
+      }
+
+      await login(data.token);
+      navigate("/home");
+
+    } catch (err) {
+      console.error("Error:", err);
+      setOtpError("Network error!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ── 2FA OTP screen ──────────────────────────────────────────────────────────
+  if (requires2fa) {
+    return (
+      <div>
+        <div className={styles.card}>
+          <h2 className={styles.title}>Two-Factor Auth</h2>
+          <p style={{ fontSize: 13, color: '#888780', margin: '0 0 16px', textAlign: 'center' }}>
+            Enter the 6-digit code from your authenticator app
+          </p>
+
+          <form onSubmit={handleOtpSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <input
+              className={styles.input}
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="000000"
+              value={otp}
+              onChange={e => { setOtp(e.target.value.replace(/\D/g, '')); setOtpError(''); }}
+              style={{ textAlign: 'center', fontSize: 24, letterSpacing: '0.3em' }}
+              autoFocus
+            />
+
+            {otpError && (
+              <p style={{ color: '#E24B4A', fontSize: 13, margin: 0, textAlign: 'center' }}>
+                {otpError}
+              </p>
+            )}
+
+            <button
+              className={styles.button}
+              type="submit"
+              disabled={loading || otp.length !== 6}
+            >
+              {loading ? 'Verifying…' : 'Verify'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setRequires2fa(false); setOtp(''); setOtpError(''); }}
+              style={{
+                background: 'none', border: 'none',
+                color: '#888780', fontSize: 13, cursor: 'pointer',
+              }}
+            >
+              ← Back to login
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Normal login screen ─────────────────────────────────────────────────────
   return (
     <div>
       <form className={styles.card} onSubmit={handleSubmit}>
@@ -115,8 +167,14 @@ export default function LoginForm() {
           required
         />
 
-        <button className={styles.button} type="submit">
-          Log In
+        {error && (
+          <p style={{ color: '#E24B4A', fontSize: 13, margin: 0, textAlign: 'center' }}>
+            {error}
+          </p>
+        )}
+
+        <button className={styles.button} type="submit" disabled={loading}>
+          {loading ? 'Logging in…' : 'Log In'}
         </button>
       </form>
     </div>

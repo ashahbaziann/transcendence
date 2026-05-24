@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import ProfileCard from "../components/content/ProfileCard";
 import FriendsList from "../components/content/FriendsList";
 import styles from "./ProfilePage.module.css";
+import TwoFactorSettings from '../components/auth/TwoFactorSettings';
+
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -34,11 +36,14 @@ export default function ProfilePage() {
 
   if (loading) return <div className={styles.container}><p style={{color:"white"}}>Loading...</p></div>;
 
+  const token = localStorage.getItem("token")
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
         <ProfileCard profile={profile} userId={user?.userId} onLogout={handleLogout} />
         <FriendsList userId={user?.userId} />
+        <TwoFactorSettings token={token} />
       </div>
     </div>
   );
