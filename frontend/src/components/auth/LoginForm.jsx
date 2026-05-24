@@ -82,7 +82,7 @@ export default function LoginForm() {
       await login(res.data.token);
 
       alert("Logged in successfully!");
-      navigate("/profile");
+      navigate("/home");
 
     } catch (err) {
       console.error("Error:", err);

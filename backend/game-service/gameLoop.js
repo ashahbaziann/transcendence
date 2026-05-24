@@ -13,18 +13,41 @@ const WINNING_SCORE = 5;
 const TICK_RATE   = 1000 / 60;
 const POWERUP_TYPES = ['speed_up', 'slow_down', 'big_paddle'];
 
-export function startgame(room)
-{
-    room.interval = setInterval(async() =>{
-        await tick(room);
-},TICK_RATE);
+
+// Inga added May 23 - START
+
+// export function startgame(room)
+// {
+//     room.interval = setInterval(async() =>{
+//         await tick(room);
+// },TICK_RATE);
+// }
+
+// export function stopgame(room)
+// {
+//     clearInterval(room.interval)
+//     room.interval =null
+// }
+
+async function tickLoop(room) {
+    if (room.status === 'gameover' || room.status === 'stopped') return;
+    await tick(room);
+    if (room.status === 'gameover' || room.status === 'stopped') return;
+    room.interval = setTimeout(() => tickLoop(room), TICK_RATE);
 }
 
-export function stopgame(room)
-{
-    clearInterval(room.interval)
-    room.interval =null
+export function startgame(room) {
+    room.interval = setTimeout(() => tickLoop(room), TICK_RATE);
 }
+
+export function stopgame(room) {
+    clearTimeout(room.interval);
+    room.interval = null;
+    room.status   = 'stopped';
+}
+
+// Inga added May 23 - END
+
 
 function movePaddles(room)
 {
@@ -139,39 +162,73 @@ async function checkScoring(room)
     if(ball.x < 0)
     {
         right.score+=1
-        if(right.score === room.settings.winningScore)
-        {
+        // Inga added May 23 - START
+        // if(right.score === room.settings.winningScore)
+        // {
+        //     await saveMatchResult({
+        //     winnerId:    room.players[1].ws.userId,
+        //     loserId:     room.players[0].ws.userId,
+        //     winnerScore: right.score,
+        //     loserScore:  left.score,
+        //     duration:    Date.now() - room.time
+        //     });
+        //     room.status = "gameover"
+        //     broadcastGameOver(room, 'right'); 
+        // }
+        // else
+        //     restartball(room,+1)
+        if (right.score === room.settings.winningScore) {
+            room.status = 'gameover';
+            stopgame(room);
+            broadcastGameOver(room, 'right');
             await saveMatchResult({
-            winnerId:    room.players[1].ws.userId,
-            loserId:     room.players[0].ws.userId,
-            winnerScore: right.score,
-            loserScore:  left.score,
-            duration:    Date.now() - room.time
-            });
-            room.status = "gameover"
-            broadcastGameOver(room, 'right'); 
-        }
-        else
+                winnerId:    room.players[1].ws.userId,
+                loserId:     room.players[0].ws.userId,
+                winnerScore: right.score,
+                loserScore:  left.score,
+                duration:    Date.now() - room.time,
+            }).catch(console.error);
+        } 
+         else
             restartball(room,+1)
+        // Inga added May 23 - END
+        return;
     }
 
     if(ball.x > W)
     {
         left.score+=1
-        if(left.score === room.settings.winningScore)
-        {
+
+        // Inga added May 23 - START
+        // if(left.score === room.settings.winningScore)
+        // {
+        //     await saveMatchResult({
+        //     winnerId:    room.players[0].ws.userId,
+        //     loserId:     room.players[1].ws.userId,
+        //     winnerScore: left.score,
+        //     loserScore:  right.score,
+        //     duration:    Date.now() - room.time
+        //      });
+        //     room.status = "gameover"
+        //     broadcastGameOver(room, 'left'); 
+        // }
+
+        if (left.score === room.settings.winningScore) {
+            room.status = 'gameover';
+            stopgame(room);
+            broadcastGameOver(room, 'left');
             await saveMatchResult({
-            winnerId:    room.players[0].ws.userId,
-            loserId:     room.players[1].ws.userId,
-            winnerScore: left.score,
-            loserScore:  right.score,
-            duration:    Date.now() - room.time
-             });
-            room.status = "gameover"
-            broadcastGameOver(room, 'left'); 
+                winnerId:    room.players[0].ws.userId,
+                loserId:     room.players[1].ws.userId,
+                winnerScore: left.score,
+                loserScore:  right.score,
+                duration:    Date.now() - room.time,
+            }).catch(console.error);
         }
         else
             restartball(room,-1)
+
+        // Inga added May 23 - END
     }
 }
 
@@ -215,6 +272,7 @@ function applypowerup(room,type)
             room.gameState.right.height+=30
 
             setTimeout(()=>{
+            if (room.status === 'gameover' || room.status === 'stopped') return; // Inga added May 23 - check if game ended before reverting power-up
             room.gameState.left.height -=30
             room.gameState.right.height-=30
             },5000);
@@ -266,6 +324,7 @@ async function tick(room)
      checkWallCollision(room)
      paddlecollision(room)
      await checkScoring(room)
+     if (room.status !== 'playing') return; // Inga added May 23 - check if game ended after scoring
      spawnPowerUp(room);
      checkPowerUps(room);
      broadcaststate(room);  

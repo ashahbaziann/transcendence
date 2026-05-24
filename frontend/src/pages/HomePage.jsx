@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUser } from '../hooks/useCurrentUser';
-import { useFriends }     from '../hooks/useFriends';
 import { getUserStats }   from '../api';
+import FriendsList from '../components/content/FriendsList';
 
 const POWERUP_DESCRIPTIONS = {
   speed_up:   { icon: '⚡', label: 'Speed up',    desc: 'Ball accelerates on hit' },
@@ -11,10 +11,10 @@ const POWERUP_DESCRIPTIONS = {
 };
 
 const BG_THEMES = [
-  { id: 'classic', label: 'Classic',   color: '#111111' },
-  { id: 'ocean',   label: 'Ocean',     color: '#0a1628' },
-  { id: 'forest',  label: 'Forest',    color: '#0d1f0f' },
-  { id: 'dusk',    label: 'Dusk',      color: '#1a0a1f' },
+  { id: 'classic', label: 'Classic', color: '#111111' },
+  { id: 'ocean',   label: 'Ocean',   color: '#0a1628' },
+  { id: 'forest',  label: 'Forest',  color: '#0d1f0f' },
+  { id: 'dusk',    label: 'Dusk',    color: '#1a0a1f' },
 ];
 
 // ─── small reusable pieces ────────────────────────────────────────────────────
@@ -41,17 +41,6 @@ function Avatar({ user, size = 44 }) {
     }}>
       {initials}
     </div>
-  );
-}
-
-function StatusDot({ status }) {
-  const colors = { online: '#1D9E75', in_game: '#EF9F27', offline: '#888780' };
-  return (
-    <span style={{
-      width: 9, height: 9, borderRadius: '50%', flexShrink: 0,
-      background: colors[status] || colors.offline,
-      display: 'inline-block',
-    }} />
   );
 }
 
@@ -101,8 +90,8 @@ function StatsPanel({ userId }) {
       <SectionTitle>My stats</SectionTitle>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
         {[
-          { label: 'Wins',    value: wins,   color: '#1D9E75' },
-          { label: 'Losses',  value: losses, color: '#E24B4A' },
+          { label: 'Wins',     value: wins,        color: '#1D9E75' },
+          { label: 'Losses',   value: losses,      color: '#E24B4A' },
           { label: 'Win rate', value: `${ratio}%`, color: '#EF9F27' },
         ].map(({ label, value, color }) => (
           <div key={label} style={{
@@ -128,10 +117,7 @@ function StatsPanel({ userId }) {
                   padding: '8px 10px', borderRadius: 8,
                   background: 'rgba(255,255,255,0.03)',
                 }}>
-                  <span style={{
-                    fontSize: 12, fontWeight: 600,
-                    color: won ? '#1D9E75' : '#E24B4A',
-                  }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: won ? '#1D9E75' : '#E24B4A' }}>
                     {won ? 'WIN' : 'LOSS'}
                   </span>
                   <span style={{ fontSize: 12, color: '#ccc' }}>
@@ -150,63 +136,7 @@ function StatsPanel({ userId }) {
   );
 }
 
-// ─── Friends panel ────────────────────────────────────────────────────────────
-
-function FriendsPanel({ friends, loading, onInvite }) {
-  if (loading) return (
-    <Card>
-      <SectionTitle>Friends</SectionTitle>
-      <p style={{ color: '#888780', fontSize: 13 }}>Loading…</p>
-    </Card>
-  );
-
-  return (
-    <Card>
-      <SectionTitle>Friends</SectionTitle>
-      {friends.length === 0 ? (
-        <p style={{ color: '#888780', fontSize: 13, margin: 0 }}>
-          No friends added yet.
-        </p>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {friends.map(f => (
-            <div key={f.id} style={{
-              display: 'flex', alignItems: 'center',
-              gap: 10, padding: '8px 10px', borderRadius: 10,
-              background: 'rgba(255,255,255,0.03)',
-            }}>
-              <Avatar user={f} size={34} />
-              <StatusDot status={f.status} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 500, color: '#eee', truncate: true }}>
-                  {f.username}
-                </div>
-                <div style={{ fontSize: 11, color: '#888780', textTransform: 'capitalize' }}>
-                  {f.status || 'offline'}
-                </div>
-              </div>
-              {f.status === 'online' && (
-                <button
-                  onClick={() => onInvite(f)}
-                  style={{
-                    fontSize: 11, padding: '4px 10px',
-                    borderRadius: 6, border: '0.5px solid #1D9E75',
-                    background: 'transparent', color: '#1D9E75',
-                    cursor: 'pointer', whiteSpace: 'nowrap',
-                  }}
-                >
-                  Invite
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </Card>
-  );
-}
-
-// ─── About / rules panel ──────────────────────────────────────────────────────
+// ─── About panel ─────────────────────────────────────────────────────────────
 
 function AboutPanel() {
   return (
@@ -214,8 +144,8 @@ function AboutPanel() {
       <SectionTitle>How to play</SectionTitle>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {[
-          { keys: 'W / S',       role: 'Left paddle (Player 1)' },
-          { keys: '↑ / ↓',      role: 'Right paddle (Player 2)' },
+          { keys: 'W / S',  role: 'Left paddle (Player 1)' },
+          { keys: '↑ / ↓', role: 'Right paddle (Player 2)' },
         ].map(({ keys, role }) => (
           <div key={keys} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <kbd style={{
@@ -230,7 +160,7 @@ function AboutPanel() {
         ))}
         <p style={{ fontSize: 12, color: '#888780', margin: '4px 0 0', lineHeight: 1.6 }}>
           First to reach the winning score wins. Power-ups appear mid-game —
-          hit the ball into them to activate. Both paddles are affected.
+          hit the ball into them to activate.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
           {Object.values(POWERUP_DESCRIPTIONS).map(({ icon, label, desc }) => (
@@ -250,24 +180,71 @@ function AboutPanel() {
 
 // ─── Game Lobby ───────────────────────────────────────────────────────────────
 
-function GameLobby({ user, friends, onStart }) {
-  const [mode, setMode]             = useState(null);      // 'local' | 'friend'
-  const [selectedFriend, setFriend] = useState(null);
-  const [powerUps, setPowerUps]     = useState(false);
-  const [winScore, setWinScore]     = useState(5);
-  const [bgTheme, setBgTheme]       = useState('classic');
+function GameLobby({ user, selectedFriend, onClearFriend, onStart }) {
+  const [mode, setMode]         = useState(null);
+  const [powerUps, setPowerUps] = useState(false);
+  const [winScore, setWinScore] = useState(5);
+  const [bgTheme, setBgTheme]   = useState('classic');
 
-  const canStart = mode === 'local' || (mode === 'friend' && selectedFriend);
+  // Player 2 login state
+  const [player2Token,    setPlayer2Token]    = useState(null);
+  const [player2Email,    setPlayer2Email]    = useState('');
+  const [player2Password, setPlayer2Password] = useState('');
+  const [player2Error,    setPlayer2Error]    = useState('');
+  const [player2Loading,  setPlayer2Loading]  = useState(false);
 
-  const onlineF = friends.filter(f => f.status === 'online');
+  const canStart = mode === 'local' || (mode === 'friend' && selectedFriend && player2Token);
+
+  // Reset all player2 state and clear friend selection
+  function clearFriend() {
+    onClearFriend();
+    setPlayer2Token(null);
+    setPlayer2Email('');
+    setPlayer2Password('');
+    setPlayer2Error('');
+  }
+
+  async function handlePlayer2Login() {
+    setPlayer2Loading(true);
+    setPlayer2Error('');
+    try {
+      const res = await fetch('https://localhost:8443/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email:    player2Email,
+          password: player2Password,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPlayer2Error(data.error || 'Login failed');
+        return;
+      }
+      setPlayer2Token(data.token);
+    } catch {
+      setPlayer2Error('Could not connect to server');
+    } finally {
+      setPlayer2Loading(false);
+    }
+  }
 
   function handleStart() {
     onStart({
       mode,
-      opponent: selectedFriend,
+      opponent:     selectedFriend,
+      player2Token, // ← pass player2Token up
       settings: { powerUps, winScore, bgTheme },
     });
   }
+
+  const inputStyle = {
+    padding: '9px 12px', borderRadius: 8,
+    border: '0.5px solid rgba(255,255,255,0.15)',
+    background: 'rgba(255,255,255,0.05)',
+    color: '#eee', fontSize: 13, outline: 'none',
+    width: '100%', boxSizing: 'border-box',
+  };
 
   return (
     <Card style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -278,17 +255,20 @@ function GameLobby({ user, friends, onStart }) {
         <p style={{ fontSize: 12, color: '#888780', margin: '0 0 10px' }}>Select mode</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {[
-            { id: 'local',  icon: '🕹️',  title: 'Local',       sub: 'Same keyboard' },
-            { id: 'friend', icon: '👥',  title: 'With friend', sub: 'From friends list' },
+            { id: 'local',  icon: '🕹️', title: 'Local',       sub: 'Same keyboard' },
+            { id: 'friend', icon: '👥', title: 'With friend', sub: 'From friends list' },
           ].map(({ id, icon, title, sub }) => (
             <button
               key={id}
-              onClick={() => { setMode(id); setFriend(null); }}
+              onClick={() => {
+                setMode(id);
+                if (id === 'local') {
+                  clearFriend();
+                }
+              }}
               style={{
                 padding: '14px 10px', borderRadius: 10, cursor: 'pointer',
-                border: mode === id
-                  ? '1.5px solid #1D9E75'
-                  : '0.5px solid rgba(255,255,255,0.1)',
+                border: mode === id ? '1.5px solid #1D9E75' : '0.5px solid rgba(255,255,255,0.1)',
                 background: mode === id ? 'rgba(29,158,117,0.1)' : 'rgba(255,255,255,0.03)',
                 color: mode === id ? '#1D9E75' : '#aaa',
                 textAlign: 'center', transition: 'all 0.15s',
@@ -302,38 +282,97 @@ function GameLobby({ user, friends, onStart }) {
         </div>
       </div>
 
-      {/* Friend picker */}
+      {/* Friend picker / Player 2 login */}
       {mode === 'friend' && (
         <div>
-          <p style={{ fontSize: 12, color: '#888780', margin: '0 0 10px' }}>
-            Online friends
-          </p>
-          {onlineF.length === 0 ? (
-            <p style={{ fontSize: 13, color: '#888780' }}>No friends online right now.</p>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {onlineF.map(f => (
+          {!selectedFriend && (
+            <p style={{ fontSize: 12, color: '#888780', margin: 0 }}>
+              Select a friend from the list below ↓
+            </p>
+          )}
+
+          {selectedFriend && !player2Token && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {/* Selected friend header with X button */}
+              <div style={{
+                display: 'flex', alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 10px', borderRadius: 8,
+                background: 'rgba(255,255,255,0.04)',
+                border: '0.5px solid rgba(255,255,255,0.1)',
+              }}>
+                <span style={{ fontSize: 13, color: '#ccc' }}>
+                  Playing against <strong style={{ color: '#eee' }}>{selectedFriend.username}</strong>
+                </span>
                 <button
-                  key={f.id}
-                  onClick={() => setFriend(f)}
+                  onClick={clearFriend}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '9px 12px', borderRadius: 9, cursor: 'pointer',
-                    border: selectedFriend?.id === f.id
-                      ? '1.5px solid #1D9E75'
-                      : '0.5px solid rgba(255,255,255,0.1)',
-                    background: selectedFriend?.id === f.id
-                      ? 'rgba(29,158,117,0.08)' : 'rgba(255,255,255,0.03)',
-                    color: '#eee', textAlign: 'left',
+                    background: 'none', border: 'none',
+                    color: '#888780', cursor: 'pointer', fontSize: 16, padding: 0,
                   }}
                 >
-                  <Avatar user={f} size={30} />
-                  <span style={{ fontSize: 13, fontWeight: 500 }}>{f.username}</span>
-                  {selectedFriend?.id === f.id && (
-                    <span style={{ marginLeft: 'auto', color: '#1D9E75', fontSize: 12 }}>✓</span>
-                  )}
+                  ✕
                 </button>
-              ))}
+              </div>
+
+              {/* Player 2 login form */}
+              <p style={{ fontSize: 12, color: '#888780', margin: '4px 0 0' }}>
+                {selectedFriend.username}, please log in to join:
+              </p>
+              <input
+                type="email"
+                placeholder={`${selectedFriend.username}'s email`}
+                value={player2Email}
+                onChange={e => { setPlayer2Email(e.target.value); setPlayer2Error(''); }}
+                style={inputStyle}
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={player2Password}
+                onChange={e => { setPlayer2Password(e.target.value); setPlayer2Error(''); }}
+                onKeyDown={e => e.key === 'Enter' && handlePlayer2Login()}
+                style={inputStyle}
+              />
+              {player2Error && (
+                <span style={{ fontSize: 12, color: '#E24B4A' }}>{player2Error}</span>
+              )}
+              <button
+                onClick={handlePlayer2Login}
+                disabled={player2Loading || !player2Password || !player2Email}
+                style={{
+                  padding: '9px 0', borderRadius: 8,
+                  cursor: (player2Loading || !player2Password || !player2Email) ? 'not-allowed' : 'pointer',
+                  background: 'rgba(29,158,117,0.15)',
+                  border: '0.5px solid #1D9E75',
+                  color: '#1D9E75', fontSize: 13, fontWeight: 600,
+                  opacity: (player2Loading || !player2Password || !player2Email) ? 0.5 : 1,
+                }}
+              >
+                {player2Loading ? 'Verifying…' : `Confirm as ${selectedFriend.username}`}
+              </button>
+            </div>
+          )}
+
+          {selectedFriend && player2Token && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{
+                fontSize: 12, color: '#1D9E75',
+                padding: '8px 10px', borderRadius: 6,
+                background: 'rgba(29,158,117,0.08)',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              }}>
+                <span>✓ {selectedFriend.username} is ready</span>
+                <button
+                  onClick={clearFriend}
+                  style={{
+                    background: 'none', border: 'none',
+                    color: '#888780', cursor: 'pointer', fontSize: 14, padding: 0,
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -374,11 +413,8 @@ function GameLobby({ user, friends, onStart }) {
                   style={{
                     width: 32, height: 32, borderRadius: 8, cursor: 'pointer',
                     background: t.color,
-                    border: bgTheme === t.id
-                      ? '2px solid #1D9E75'
-                      : '0.5px solid rgba(255,255,255,0.2)',
-                    padding: 0,
-                    position: 'relative',
+                    border: bgTheme === t.id ? '2px solid #1D9E75' : '0.5px solid rgba(255,255,255,0.2)',
+                    padding: 0, position: 'relative',
                   }}
                 >
                   {bgTheme === t.id && (
@@ -394,15 +430,10 @@ function GameLobby({ user, friends, onStart }) {
           </div>
 
           {/* Power-ups toggle */}
-          <div style={{
-            display: 'flex', alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <div style={{ fontSize: 12, color: '#aaa' }}>Power-ups</div>
-              <div style={{ fontSize: 11, color: '#666' }}>
-                speed · slow · big paddle
-              </div>
+              <div style={{ fontSize: 11, color: '#666' }}>speed · slow · big paddle</div>
             </div>
             <button
               onClick={() => setPowerUps(v => !v)}
@@ -429,15 +460,19 @@ function GameLobby({ user, friends, onStart }) {
         onClick={handleStart}
         disabled={!canStart}
         style={{
-          marginTop: 4,
-          padding: '13px 0', borderRadius: 10, cursor: canStart ? 'pointer' : 'not-allowed',
+          marginTop: 4, padding: '13px 0', borderRadius: 10,
+          cursor: canStart ? 'pointer' : 'not-allowed',
           background: canStart ? '#1D9E75' : 'rgba(255,255,255,0.06)',
           border: 'none', color: canStart ? '#fff' : '#555',
           fontSize: 15, fontWeight: 600, letterSpacing: '0.03em',
           transition: 'all 0.15s',
         }}
       >
-        {canStart ? '▶  Start game' : 'Select a mode to continue'}
+        {canStart ? '▶  Start game' : (
+          mode === 'friend' && selectedFriend && !player2Token
+            ? `Waiting for ${selectedFriend.username} to log in`
+            : 'Select a mode to continue'
+        )}
       </button>
     </Card>
   );
@@ -446,17 +481,17 @@ function GameLobby({ user, friends, onStart }) {
 // ─── HomePage root ────────────────────────────────────────────────────────────
 
 export default function HomePage() {
-  const navigate            = useNavigate();
-  const { user, loading }   = useCurrentUser();
-  const { friends, loading: friendsLoading } = useFriends(user?.id);
+  const navigate          = useNavigate();
+  const { user, loading } = useCurrentUser();
+  const [selectedFriend, setSelectedFriend] = useState(null);
 
-  function handleStart({ mode, opponent, settings }) {
-    // Pass everything via router state — GamePage reads it
+  // Receive player2Token from GameLobby and pass it to navigate state
+  function handleStart({ mode, opponent, player2Token, settings }) {
     navigate('/game', {
       state: {
-        mode,                         // 'local' | 'friend'
-        opponentId:    opponent?.id   ?? null,
-        opponentToken: null,          // filled later when you implement invite flow
+        mode,
+        opponentId:    opponent?.user_id ?? null,
+        opponentToken: player2Token ?? null, // ← correctly forwarded
         settings,
       },
     });
@@ -476,9 +511,7 @@ export default function HomePage() {
 
   return (
     <div style={{
-      minHeight: '100vh',
-      background: '#0d0d0d',
-      color: '#eee',
+      minHeight: '100vh', background: '#0d0d0d', color: '#eee',
       fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif",
     }}>
       {/* Top bar */}
@@ -495,13 +528,15 @@ export default function HomePage() {
         </span>
         {user && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Avatar user={user} size={32} />
+            <div onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
+              <Avatar user={user} size={32} />
+            </div>
             <span style={{ fontSize: 13, color: '#ccc' }}>{user.username}</span>
           </div>
         )}
       </header>
 
-      {/* Main layout: sidebar left, content right */}
+      {/* Main layout */}
       <div style={{
         maxWidth: 1100, margin: '0 auto',
         padding: '28px 24px',
@@ -512,7 +547,7 @@ export default function HomePage() {
       }}>
         {/* Left column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <StatsPanel userId={user?.id} />
+          <StatsPanel userId={user?.userId} />
           <AboutPanel />
         </div>
 
@@ -520,17 +555,13 @@ export default function HomePage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <GameLobby
             user={user}
-            friends={friends}
+            selectedFriend={selectedFriend}
+            onClearFriend={() => setSelectedFriend(null)}
             onStart={handleStart}
           />
-          <FriendsPanel
-            friends={friends}
-            loading={friendsLoading}
-            onInvite={(f) => handleStart({
-              mode: 'friend',
-              opponent: f,
-              settings: { powerUps: false, winScore: 5, bgTheme: 'classic' },
-            })}
+          <FriendsList
+            userId={user?.userId}
+            onInvite={(f) => setSelectedFriend(f)}
           />
         </div>
       </div>

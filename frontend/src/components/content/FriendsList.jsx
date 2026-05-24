@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import styles from "./FriendsList.module.css";
 
-export default function FriendsList({ userId }) {
+
+// Inga added May 23 - onInvite in function signature
+export default function FriendsList({ userId, onInvite }) {
   const [friends, setFriends] = useState([]);
   const [searchInput, setSearchInput] = useState("");
   const [searchResult, setSearchResult] = useState(null);
@@ -9,12 +11,12 @@ export default function FriendsList({ userId }) {
   const token = localStorage.getItem("token");
 
   const fetchFriends = () => {
-    fetch(`http://localhost:3002/users/${userId}/friends`, {
+    fetch(`https://localhost:8443/api/user/users/${userId}/friends`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
       .then(data => setFriends(Array.isArray(data) ? data : []));
-  };
+  };  
 
   useEffect(() => {
     fetchFriends();
@@ -26,7 +28,7 @@ export default function FriendsList({ userId }) {
     setError("");
     setSearchResult(null);
     if (!searchInput.trim()) return;
-    const res = await fetch(`http://localhost:3002/users?username=${searchInput.trim()}`, {
+    const res = await fetch(`https://localhost:8443/api/user/users?username=${searchInput.trim()}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     const data = await res.json();
@@ -42,7 +44,7 @@ export default function FriendsList({ userId }) {
 
   const handleAdd = async (friendUserId) => {
     setError("");
-    const res = await fetch(`http://localhost:3002/users/${userId}/friends/${friendUserId}`, {
+    const res = await fetch(`https://localhost:8443/api/user/users/${userId}/friends/${friendUserId}`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -54,7 +56,7 @@ export default function FriendsList({ userId }) {
   };
 
   const handleRemove = async (fid) => {
-    await fetch(`http://localhost:3002/users/${userId}/friends/${fid}`, {
+    await fetch(`https://localhost:8443/api/user/users/${userId}/friends/${fid}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -85,7 +87,7 @@ export default function FriendsList({ userId }) {
             src={searchResult.avatar
               ? searchResult.avatar.startsWith('http')
                 ? searchResult.avatar
-                : `http://localhost:3002${searchResult.avatar}`
+                : `https://localhost:8443/api/user${searchResult.avatar}`
               : `https://api.dicebear.com/7.x/identicon/svg?seed=${searchResult.username}`}
             alt={searchResult.username}
             className={styles.avatar}
@@ -103,7 +105,7 @@ export default function FriendsList({ userId }) {
               src={f.avatar
                 ? f.avatar.startsWith('http')
                   ? f.avatar
-                  : `http://localhost:3002${f.avatar}`
+                  : `https://localhost:8443/api/user${f.avatar}`
                 : `https://api.dicebear.com/7.x/identicon/svg?seed=${f.username}`}
               alt={f.username}
               className={styles.avatar}
@@ -115,9 +117,19 @@ export default function FriendsList({ userId }) {
               </span>
             </div>
             <button className={styles.remove} onClick={() => handleRemove(f.user_id)}>✕</button>
+
+            {onInvite && f.online && (
+              <button className={styles.button} onClick={() => onInvite(f)}>
+                Invite
+              </button>
+            )}
+
+
           </div>
         ))}
       </div>
     </div>
   );
 }
+
+//Inga added May 23 - onInvite prop passed to FriendsList and invite button rendered for online friends.

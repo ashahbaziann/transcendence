@@ -97,23 +97,47 @@ wss.on('connection', async(ws,req) => {
     
     ws.on('close', () =>{
     
-        if(waitingplayer === ws)
-        {
-            waitingplayer=null
-            return
-        }
+        // Inga added May 23 - START
+
+        // if(waitingplayer === ws)
+        // {
+        //     waitingplayer=null
+        //     return
+        // }
     
-        const room =gameManager.getroombyWS(ws)
-        if(!room)
-            return
+        // const room =gameManager.getroombyWS(ws)
+        // if(!room)
+        //     return
     
-        stopgame(room)
+        // stopgame(room)
        
-        const opponent = gameManager.getopponent(room, ws)
-        if(opponent && opponent.ws.readyState == 1 )
-            opponent.ws.send(JSON.stringify({type: 'opponent_disconnected'}))
+        // const opponent = gameManager.getopponent(room, ws)
+        // if(opponent && opponent.ws.readyState == 1 )
+        //     opponent.ws.send(JSON.stringify({type: 'opponent_disconnected'}))
     
-        gameManager.deleteid(room.id)
+        // gameManager.deleteid(room.id)
+        
+        if (waitingplayer === ws) {
+            waitingplayer = null;
+            return;
+        }
+
+        const room = gameManager.getroombyWS(ws);
+        if (!room) return;
+
+        if (room.status === 'gameover') {
+            gameManager.deleteid(room.id);
+            return;
+        }
+
+        stopgame(room);
+        const opponent = gameManager.getopponent(room, ws);
+        if (opponent && opponent.ws.readyState === 1)
+            opponent.ws.send(JSON.stringify({ type: 'opponent_disconnected' }));
+        gameManager.deleteid(room.id);
+
+        // Inga added May 23 - END
+
     });
 });
 
