@@ -16,7 +16,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!user) return;
     const token = localStorage.getItem("token");
-    fetch(`http://localhost:3002/users/${user.userId}`, {
+    fetch(`https://localhost:8443/api/user/users/${user.userId}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -26,7 +26,7 @@ export default function ProfilePage() {
 
   const handleLogout = () => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:3005/auth/logout", {
+    fetch("https://localhost:8443/auth/logout", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -41,7 +41,7 @@ export default function ProfilePage() {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <ProfileCard profile={profile} userId={user?.userId} onLogout={handleLogout} />
+        <ProfileCard key={user?.userId} profile={profile} userId={user?.userId} onLogout={handleLogout} />
         <FriendsList userId={user?.userId} />
         <TwoFactorSettings token={token} />
       </div>
