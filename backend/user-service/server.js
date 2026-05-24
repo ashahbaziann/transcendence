@@ -273,6 +273,22 @@ app.delete('/users/:id/friends/:friendId', authMiddleware, async (req, res) => {
   }
 });
 
+// PUT /users/stats/internal - called by game-service after match
+app.put('/users/stats/internal', async (req, res) => {
+  try {
+    const { user_id, column } = req.body;
+    if (!['wins', 'losses', 'draws'].includes(column))
+      return res.status(400).json({ error: 'Invalid column' });
+    await pool.query(
+      `UPDATE users SET ${column} = ${column} + 1 WHERE user_id = $1`,
+      [user_id]
+    );
+    res.json({ message: 'Stats updated' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 404
 app.use((req, res) => res.status(404).send());
 
