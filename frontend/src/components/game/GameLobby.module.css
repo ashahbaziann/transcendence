@@ -1,0 +1,270 @@
+.card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888780;
+  margin: 0 0 14px;
+  padding: 0 0 8px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.label {
+  font-size: 12px;
+  color: #888780;
+  margin: 0 0 10px;
+}
+
+.hint {
+  font-size: 12px;
+  color: #888780;
+  margin: 0;
+}
+
+/* ── Mode selector ── */
+
+.modeGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.modeButton {
+  padding: 14px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: #aaa;
+  text-align: center;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.modeButtonActive {
+  border: 1.5px solid #1D9E75;
+  background: rgba(29, 158, 117, 0.1);
+  color: #1D9E75;
+}
+
+.modeIcon  { font-size: 22px; }
+.modeTitle { font-size: 13px; font-weight: 600; }
+.modeSub   { font-size: 11px; opacity: 0.7; }
+
+/* ── Player 2 login ── */
+
+.player2Section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.selectedFriendRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.selectedFriendText {
+  font-size: 13px;
+  color: #ccc;
+}
+
+.selectedFriendText strong {
+  color: #eee;
+}
+
+.clearButton {
+  background: none;
+  border: none;
+  color: #888780;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  line-height: 1;
+}
+
+.input {
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: #eee;
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.error {
+  font-size: 12px;
+  color: #E24B4A;
+}
+
+.confirmButton {
+  padding: 9px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  background: rgba(29, 158, 117, 0.15);
+  border: 0.5px solid #1D9E75;
+  color: #1D9E75;
+  font-size: 13px;
+  font-weight: 600;
+  width: 100%;
+  transition: opacity 0.15s;
+}
+
+.confirmButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.readyRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #1D9E75;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(29, 158, 117, 0.08);
+}
+
+/* ── Customization ── */
+
+.customization {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.scoreRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.scoreLabel { font-size: 12px; color: #aaa; }
+.scoreValue { font-size: 12px; font-weight: 600; color: #eee; }
+
+.slider {
+  width: 100%;
+}
+
+.sliderRange {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #666;
+}
+
+.themeRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.themeButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  padding: 0;
+  position: relative;
+}
+
+.themeButtonActive {
+  border: 2px solid #1D9E75;
+}
+
+.themeCheck {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1D9E75;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.powerupRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.powerupTitle { font-size: 12px; color: #aaa; }
+.powerupSub   { font-size: 11px; color: #666; }
+
+.toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  padding: 0;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.toggleOn {
+  background: #1D9E75;
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.2s;
+}
+
+.toggleThumbOn {
+  left: 23px;
+}
+
+/* ── Start button ── */
+
+.startButton {
+  margin-top: 4px;
+  padding: 13px 0;
+  border-radius: 10px;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  color: #555;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: all 0.15s;
+  width: 100%;
+}
+
+.startButtonActive {
+  background: #1D9E75;
+  color: #fff;
+  cursor: pointer;
+}

@@ -1,0 +1,66 @@
+.page {
+  min-height: 100vh;
+  background: #0d0d0d;
+  color: #eee;
+  font-family: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+}
+
+.loading {
+  min-height: 100vh;
+  background: #0d0d0d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888780;
+  font-family: monospace;
+}
+
+.header {
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #1D9E75;
+  font-family: monospace;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.username {
+  font-size: 13px;
+  color: #ccc;
+}
+
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 24px;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

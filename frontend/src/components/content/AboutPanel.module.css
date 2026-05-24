@@ -1,0 +1,86 @@
+.card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 20px 22px;
+}
+
+.sectionTitle {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888780;
+  margin: 0 0 14px;
+  padding: 0 0 8px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.keyBindings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.keyRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kbd {
+  font-family: monospace;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.07);
+  color: #eee;
+  white-space: nowrap;
+}
+
+.role {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.description {
+  font-size: 12px;
+  color: #888780;
+  margin: 4px 0 0;
+  line-height: 1.6;
+}
+
+.powerupList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.powerupRow {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.powerupIcon {
+  font-size: 16px;
+}
+
+.powerupLabel {
+  font-size: 12px;
+  color: #ddd;
+  font-weight: 500;
+}
+
+.powerupDesc {
+  font-size: 12px;
+  color: #888780;
+}
