@@ -1,31 +1,16 @@
-// export default function GameHUD({ status, side, countdown, winner, error, isLocal }) {
-//   return (
-//     <div style={{ color: "white", textAlign: "center" }}>
-//       {status === "connecting" && <h2>Connecting...</h2>}
-//       {status === "waiting" && <h2>Waiting for opponent...</h2>}
-//       {status === "countdown" && (
-//         <h1 style={{ fontSize: "60px" }}>{countdown}</h1>
-//       )}
-//       {status === "playing" && (
-//         <h3>{isLocal ? "W/S  vs  ↑/↓" : `You are: ${side}`}</h3>
-//       )}
-//       {status === "gameover" && <h1>Winner: {winner}</h1>}
-//       {status === "disconnected" && <h2>{error || "Disconnected"}</h2>}
-//       {status === "error" && <h2>{error}</h2>}
-//     </div>
-//   );
-// }
-
 export default function GameHUD({
   status, side, countdown, winner, error,
-  isLocal, onPlayAgain, onGoHome,
+  isLocal, player1Name = 'Player 1', player2Name = 'Player 2',
+  onPlayAgain, onGoHome,
 }) {
+  const winnerName = winner === 'left' ? player1Name : player2Name;
+
   const overlay = (children) => (
     <div style={{
       position: 'absolute', inset: 0, zIndex: 10,
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
-      background: 'rgba(0,0,0,0.6)',
+      background: 'rgba(0,0,0,0.65)',
       fontFamily: "'Inter', system-ui, sans-serif",
     }}>
       {children}
@@ -66,29 +51,37 @@ export default function GameHUD({
 
   if (status === 'playing') return (
     <div style={{
-      position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)',
-      fontSize: 12, color: 'rgba(255,255,255,0.3)',
+      position: 'absolute', top: 12, left: '50%',
+      transform: 'translateX(-50%)',
+      fontSize: 12, color: 'rgba(255,255,255,0.25)',
       fontFamily: 'monospace', zIndex: 5,
+      whiteSpace: 'nowrap',
     }}>
       {isLocal ? 'W/S  ·  ↑/↓' : `You are: ${side}`}
     </div>
   );
 
   if (status === 'gameover') return overlay(<>
-    <div style={{ fontSize: 13, color: '#888780', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+    <div style={{
+      fontSize: 13, color: '#888780',
+      letterSpacing: '0.12em', textTransform: 'uppercase',
+    }}>
       Game over
     </div>
-    <div style={{ fontSize: 48, fontWeight: 800, color: '#1D9E75', marginTop: 8 }}>
-      {winner === 'left' ? 'Player 1' : 'Player 2'} wins
+    <div style={{ fontSize: 52, fontWeight: 800, color: '#1D9E75', marginTop: 8 }}>
+      {winnerName}
     </div>
-    <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+    <div style={{ fontSize: 14, color: '#888780', marginTop: 4 }}>
+      wins the match
+    </div>
+    <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
       {btn('Play again', onPlayAgain, true)}
       {btn('Home', onGoHome)}
     </div>
   </>);
 
   if (status === 'disconnected' || status === 'error') return overlay(<>
-    <div style={{ fontSize: 18, color: '#E24B4A' }}>
+    <div style={{ fontSize: 18, color: '#E24B4A', marginBottom: 8 }}>
       {error || 'Disconnected'}
     </div>
     {btn('Go home', onGoHome)}

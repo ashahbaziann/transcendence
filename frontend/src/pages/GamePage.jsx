@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import GameCanvas from "../components/game/GameCanvas";
 import GameHUD    from "../components/game/GameHUD";
 import { useGameState }  from "../components/game/useGameState";
 import { useGameSocket } from "../components/game/useGameSocket";
+import { getUserById } from "../api";
 
 export default function GamePage() {
   const location = useLocation();
@@ -12,28 +13,39 @@ export default function GamePage() {
   const {
     mode          = "local",
     opponentToken = null,
+    opponentId    = null,
+    opponentName  = null,
     settings      = {},
   } = location.state || {};
 
   const isLocal = mode === "local" || mode === "friend";
 
+  const [player1Name, setPlayer1Name] = useState('Player 1');
+  const [player2Name, setPlayer2Name] = useState(opponentName || 'Player 2');
+
+  // Fetch player 1 username from user-service using JWT userId
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.userId) {
+        getUserById(payload.userId)
+          .then(u => setPlayer1Name(u.username || 'Player 1'))
+          .catch(() => {});
+      }
+    } catch {}
+  }, []);
+
   const {
-    gameStatus,
-    side1,
-    gameState,
-    powerUps,
-    countdown,
-    winner,
-    error,
-    reset,
-    handleMessage1,
-    handleMessage2,
+    gameStatus, side1, gameState, powerUps,
+    countdown, winner, error, reset,
+    handleMessage1, handleMessage2,
   } = useGameState();
 
   const { send: send1, isReady: ready1, reconnect: reconnect1 } = useGameSocket(handleMessage1, true, null);
   const { send: send2, reconnect: reconnect2 }                  = useGameSocket(handleMessage2, isLocal, opponentToken);
 
-  // Send settings the moment socket1 is open
   useEffect(() => {
     if (!ready1) return;
     send1({
@@ -42,12 +54,10 @@ export default function GamePage() {
       winningScore: settings.winScore  ?? 5,
       bgTheme:      settings.bgTheme   ?? "classic",
     });
-  }, [ready1]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ready1]);
 
-  // Key input
   useEffect(() => {
     if (gameStatus !== "playing") return;
-
     function handleKey(e, pressed) {
       if (e.key === "w" || e.key === "s") {
         e.preventDefault();
@@ -60,7 +70,6 @@ export default function GamePage() {
           : send1({ type: "key", key: e.key, pressed });
       }
     }
-
     const down = (e) => handleKey(e, true);
     const up   = (e) => handleKey(e, false);
     window.addEventListener("keydown", down);
@@ -72,10 +81,9 @@ export default function GamePage() {
   }, [gameStatus, send1, send2, isLocal]);
 
   function handlePlayAgain() {
-    reset();       // clear all game state
-    reconnect1();  // close socket1 and open a fresh one
-    reconnect2();  // close socket2 and open a fresh one
-    // no navigation — stays on /game, sockets reconnect, server pairs them fresh
+    reset();
+    reconnect1();
+    reconnect2();
   }
 
   const bgColor = {
@@ -87,12 +95,9 @@ export default function GamePage() {
 
   return (
     <div style={{
-      background: bgColor,
-      minHeight: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
+      background: bgColor, minHeight: "100vh",
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
       fontFamily: "'Inter', system-ui, sans-serif",
       position: "relative",
     }}>
@@ -103,6 +108,8 @@ export default function GamePage() {
         winner={winner}
         error={error}
         isLocal={isLocal}
+        player1Name={player1Name}
+        player2Name={player2Name}
         onPlayAgain={handlePlayAgain}
         onGoHome={() => navigate("/home")}
       />
@@ -110,6 +117,8 @@ export default function GamePage() {
         gameState={gameState}
         powerUps={powerUps}
         bgColor={bgColor}
+        player1Name={player1Name}
+        player2Name={player2Name}
       />
     </div>
   );

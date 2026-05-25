@@ -3,16 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import StatsPanel from '../components/content/StatsPanel';
 import AboutPanel from '../components/content/AboutPanel';
-import FriendsList from '../components/content/FriendsList';
 import GameLobby from '../components/game/GameLobby';
 import styles from './HomePage.module.css';
 
 function Avatar({ user, size = 44 }) {
   const initials = (user?.username || user?.email || '?').slice(0, 2).toUpperCase();
-  if (user?.avatarUrl) {
+  if (user?.avatar) {
+    const src = user.avatar.startsWith('http')
+      ? user.avatar
+      : `https://localhost:8443/api/user${user.avatar}`;
     return (
       <img
-        src={user.avatarUrl}
+        src={src}
         alt={user.username}
         style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover' }}
       />
@@ -42,6 +44,7 @@ export default function HomePage() {
         mode,
         opponentId:    opponent?.user_id ?? null,
         opponentToken: player2Token ?? null,
+        opponentName:  opponent?.username ?? null,
         settings,
       },
     });
@@ -70,13 +73,11 @@ export default function HomePage() {
         </div>
         <div className={styles.rightCol}>
           <GameLobby
+            userId={user?.userId}
             selectedFriend={selectedFriend}
+            onSelectFriend={setSelectedFriend}
             onClearFriend={() => setSelectedFriend(null)}
             onStart={handleStart}
-          />
-          <FriendsList
-            userId={user?.userId}
-            onInvite={(f) => setSelectedFriend(f)}
           />
         </div>
       </main>

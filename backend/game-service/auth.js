@@ -68,6 +68,12 @@ export async function saveMatchResult({ winnerId, loserId, winnerScore, loserSco
     }
   });
 
+  if (winnerId === loserId) {
+    console.log('Local game — skipping stats update');
+    return;
+  }
+
+
   await Promise.all([
     updateUserStats(winnerId, 'win'),
     updateUserStats(loserId, 'loss'),
