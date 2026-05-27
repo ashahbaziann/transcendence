@@ -1,7 +1,8 @@
-/* ===== AUTH CARD ===== */
 .card {
-  width: 380px;
-  min-height: 350px;
+  width: 100%;
+  max-width: 380px;
+  min-width: 0;
+  box-sizing: border-box;
 
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
@@ -23,7 +24,6 @@
 }
 
 
-/* ===== TITLE ===== */
 .title {
   font-size: 24px;
   color: white;
@@ -31,7 +31,6 @@
   margin-bottom: 10px;
 }
 
-/* ===== INPUT ===== */
 .input {
   width: 100%;
   padding: 12px 14px;
@@ -48,7 +47,6 @@
   background: rgba(255,255,255,0.08);
 }
 
-/* ===== BUTTON ===== */
 .button {
   width: 100%;
   padding: 12px;
@@ -65,36 +63,28 @@
   background: #2563eb;
 }
 
-/* ===== ERROR TEXT ===== */
 .error {
   color: #f87171;
   font-size: 13px;
   text-align: center;
 }
 
-/* ===== OAUTH BUTTON ===== */
 .oauth {
-
   background: #3b82f6;
   color: white;
   font-weight: bold;
-
   cursor: pointer;
   transition: all 0.2s ease;
-
   width: 100%;
-  max-width: 800px;
   padding: 14px;
   border: none;
   border-radius: 10px;
-
 }
 
 .oauth:hover {
   background: #e5e7eb;
   transform: translateY(-2px);
 }
-
 .card {
   animation: popIn 0.6s ease-out;
   transition: transform 0.2s ease;

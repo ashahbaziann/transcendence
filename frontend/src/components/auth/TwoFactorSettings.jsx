@@ -1,12 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './TwoFactorSettings.module.css';
 
 export default function TwoFactorSettings({ token }) {
-  const [step, setStep]       = useState('idle');
+  const [step, setStep]       = useState('loading');
   const [qrSvg, setQrSvg]     = useState('');
   const [otp, setOtp]         = useState('');
   const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!token) return;
+    fetch('https://localhost:8443/auth/2fa/status', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => res.json())
+      .then(data => setStep(data.enabled ? 'done' : 'idle'))
+      .catch(() => setStep('idle'));
+  }, [token]);
+
+  if (step === 'loading') return null;
 
   async function handleEnable() {
     setLoading(true);
@@ -124,6 +136,29 @@ export default function TwoFactorSettings({ token }) {
           <div className={styles.successSub}>Your account is protected with two-factor authentication.</div>
         </div>
       </div>
+      {error && <p className={styles.error}>{error}</p>}
+    <button
+      className={styles.cancel2FA}
+      onClick={async () => {
+        setLoading(true);
+        setError('');
+        try {
+          const res = await fetch('https://localhost:8443/auth/2fa/disable', {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!res.ok) { setError('Failed to disable 2FA'); return; }
+          setStep('idle');
+        } catch {
+          setError('Network error');
+        } finally {
+          setLoading(false);
+        }
+      }}
+      disabled={loading}
+    >
+      {loading ? 'Disabling…' : 'Disable 2FA'}
+    </button>
     </div>
   );
 }

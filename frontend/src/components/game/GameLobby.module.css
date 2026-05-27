@@ -31,7 +31,6 @@
   margin: 0;
 }
 
-/* ── Mode selector ── */
 
 .modeGrid {
   display: grid;
@@ -64,7 +63,6 @@
 .modeTitle { font-size: 13px; font-weight: 600; }
 .modeSub   { font-size: 11px; opacity: 0.7; }
 
-/* ── Player 2 login ── */
 
 .player2Section {
   display: flex;
@@ -147,7 +145,6 @@
   background: rgba(29, 158, 117, 0.08);
 }
 
-/* ── Customization ── */
 
 .customization {
   display: flex;
@@ -246,7 +243,6 @@
   left: 23px;
 }
 
-/* ── Start button ── */
 
 .startButton {
   margin-top: 4px;
@@ -269,7 +265,6 @@
   cursor: pointer;
 }
 
-/* ── Friend picker ── */
 
 .friendSection {
   display: flex;

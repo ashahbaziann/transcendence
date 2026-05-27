@@ -7,7 +7,6 @@ const registerRequestSchema = require('../schemas/registerRequestSchema');
 
 const prisma = new PrismaClient();
 
-// === РЕГИСТРАЦИЯ ===
 async function register(req, res) {
   try {
     const { email, password, username } = req.body;
@@ -29,16 +28,6 @@ async function register(req, res) {
       }
     });
 
-    //  // Auto-create user profile in user-service
-    // await fetch('http://user-service:3000/users', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     user_id: newUser.userId,
-    //     username: username,
-    //     email: newUser.email
-    //   })
-    // });
 
       const userServiceRes = await fetch('http://user-service:3000/users', {
     method: 'POST',
@@ -67,7 +56,6 @@ async function register(req, res) {
   }
 }
 
-// === ЛОГИН ===
 async function login(req, res) {
   try {
     const { email, password } = req.body;
@@ -107,7 +95,6 @@ async function login(req, res) {
       { expiresIn: '24h' }
     );
 
-    // Set user online
     try {
       const r = await fetch('http://user-service:3000/users/status', {
         method: 'PUT',
@@ -128,7 +115,6 @@ async function login(req, res) {
 
 async function logout(req, res){
   try{
-        // Set user offline
     await fetch('http://user-service:3000/users/status', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

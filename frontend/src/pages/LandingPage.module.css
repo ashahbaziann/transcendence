@@ -1,21 +1,39 @@
-/* ===== PAGE CENTER WRAPPER ===== */
 .container {
   display: flex;
-  justify-content: center;   /* center everything */
-  align-items: center;
-  gap: 80px;                 /* controls distance between left & right */
-
+  flex-direction: column;  
   min-height: 100vh;
-  padding: 60px;
-
-  flex-wrap: wrap;
-
   background: linear-gradient(135deg, #1e293b, #312e81, #4c1d95);
 }
 
+.content {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 80px;
+  padding: 60px;
+  flex-wrap: wrap;
+}
+
+.oauthWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 @media (max-width: 900px) {
-  .container {
+  .content {
     flex-direction: column;
     text-align: center;
+    gap: 40px;
+    padding: 40px 24px;
   }
 }
+
+@media (max-width: 600px) {
+  .content {
+    padding: 32px 16px;
+    gap: 28px;
+  }
+}
+

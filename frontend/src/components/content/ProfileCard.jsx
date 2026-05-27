@@ -16,7 +16,7 @@ export default function ProfileCard({ profile, userId, onLogout }) {
     (profile?.avatar
       ? profile.avatar.startsWith('http')
         ? profile.avatar
-        : `http://localhost:3002${profile.avatar}`
+        : `https://localhost:8443/api/user${profile.avatar}`
       : `https://api.dicebear.com/7.x/identicon/svg?seed=${profile?.username}`);
 
   const handleAvatarChange = (e) => {
@@ -40,7 +40,7 @@ export default function ProfileCard({ profile, userId, onLogout }) {
       if (selectedFile) {
         const formData = new FormData();
         formData.append("avatar", selectedFile);
-        const res = await fetch(`http://localhost:3002/users/${userId}/avatar`, {
+        const res = await fetch(`https://localhost:8443/api/user/users/${userId}/avatar`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: formData
@@ -58,7 +58,7 @@ export default function ProfileCard({ profile, userId, onLogout }) {
       }
 
       if (username !== profile?.username) {
-        const res = await fetch(`http://localhost:3002/users/${userId}`, {
+        const res = await fetch(`https://localhost:8443/api/user/users/${userId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -91,18 +91,36 @@ export default function ProfileCard({ profile, userId, onLogout }) {
       {editing && (
         <div className={styles.uploadWrapper}>
           <label className={styles.fileLabel}>
-            Change Avatar
+            Upload New Avatar
+
             <input
               type="file"
-              accept="image/*"
+              accept="image/jpeg, image/png"
               ref={fileRef}
               onChange={handleAvatarChange}
               className={styles.fileInput}
             />
           </label>
+
+          <button
+            className={styles.buttonSecondary}
+            onClick={async () => {
+              const res = await fetch(
+                `https://localhost:8443/api/user/users/${userId}/avatar`,
+                {
+                  method: 'DELETE',
+                  headers: { Authorization: `Bearer ${token}` }
+                }
+              );
+
+              if (res.ok) window.location.reload();
+              else setError('Failed to remove avatar');
+            }}
+          >
+            Remove Avatar
+          </button>
         </div>
       )}
-
       {editing ? (
         <input
           className={styles.input}

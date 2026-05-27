@@ -6,28 +6,13 @@ const H           = 500;
 const PADDLE_H    = 90;
 const PADDLE_W    = 12;
 const LEFT_X      = 20;
-const RIGHT_X     = W - 20 - PADDLE_W;   // 768
+const RIGHT_X     = W - 20 - PADDLE_W;   
 const BALL_R      = 8;
 const PADDLE_SPEED= 5;
 const WINNING_SCORE = 5;
 const TICK_RATE   = 1000 / 60;
 const POWERUP_TYPES = ['speed_up', 'slow_down', 'big_paddle'];
 
-
-// Inga added May 23 - START
-
-// export function startgame(room)
-// {
-//     room.interval = setInterval(async() =>{
-//         await tick(room);
-// },TICK_RATE);
-// }
-
-// export function stopgame(room)
-// {
-//     clearInterval(room.interval)
-//     room.interval =null
-// }
 
 async function tickLoop(room) {
     if (room.status === 'gameover' || room.status === 'stopped') return;
@@ -46,7 +31,6 @@ export function stopgame(room) {
     room.status   = 'stopped';
 }
 
-// Inga added May 23 - END
 
 
 function movePaddles(room)
@@ -162,21 +146,6 @@ async function checkScoring(room)
     if(ball.x < 0)
     {
         right.score+=1
-        // Inga added May 23 - START
-        // if(right.score === room.settings.winningScore)
-        // {
-        //     await saveMatchResult({
-        //     winnerId:    room.players[1].ws.userId,
-        //     loserId:     room.players[0].ws.userId,
-        //     winnerScore: right.score,
-        //     loserScore:  left.score,
-        //     duration:    Date.now() - room.time
-        //     });
-        //     room.status = "gameover"
-        //     broadcastGameOver(room, 'right'); 
-        // }
-        // else
-        //     restartball(room,+1)
         if (right.score === room.settings.winningScore) {
             room.status = 'gameover';
             stopgame(room);
@@ -191,27 +160,12 @@ async function checkScoring(room)
         } 
          else
             restartball(room,+1)
-        // Inga added May 23 - END
         return;
     }
 
     if(ball.x > W)
     {
         left.score+=1
-
-        // Inga added May 23 - START
-        // if(left.score === room.settings.winningScore)
-        // {
-        //     await saveMatchResult({
-        //     winnerId:    room.players[0].ws.userId,
-        //     loserId:     room.players[1].ws.userId,
-        //     winnerScore: left.score,
-        //     loserScore:  right.score,
-        //     duration:    Date.now() - room.time
-        //      });
-        //     room.status = "gameover"
-        //     broadcastGameOver(room, 'left'); 
-        // }
 
         if (left.score === room.settings.winningScore) {
             room.status = 'gameover';
@@ -228,7 +182,6 @@ async function checkScoring(room)
         else
             restartball(room,-1)
 
-        // Inga added May 23 - END
     }
 }
 
@@ -272,7 +225,7 @@ function applypowerup(room,type)
             room.gameState.right.height+=30
 
             setTimeout(()=>{
-            if (room.status === 'gameover' || room.status === 'stopped') return; // Inga added May 23 - check if game ended before reverting power-up
+            if (room.status === 'gameover' || room.status === 'stopped') return; 
             room.gameState.left.height -=30
             room.gameState.right.height-=30
             },5000);
@@ -295,10 +248,10 @@ function checkPowerUps(room)
         if(dist < BALL_R + pu.r)
         {
             applypowerup(room,pu.type)
-            return false //remove
+            return false 
         }
 
-        return true //keep
+        return true 
     })
 }
 function broadcaststate(room)
@@ -324,7 +277,7 @@ async function tick(room)
      checkWallCollision(room)
      paddlecollision(room)
      await checkScoring(room)
-     if (room.status !== 'playing') return; // Inga added May 23 - check if game ended after scoring
+     if (room.status !== 'playing') return; 
      spawnPowerUp(room);
      checkPowerUps(room);
      broadcaststate(room);  

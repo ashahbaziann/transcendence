@@ -38,6 +38,7 @@ export default function HomePage() {
   const { user, loading } = useCurrentUser();
   const [selectedFriend, setSelectedFriend] = useState(null);
 
+
   function handleStart({ mode, opponent, player2Token, settings }) {
     navigate('/game', {
       state: {
@@ -68,12 +69,12 @@ export default function HomePage() {
 
       <main className={styles.main}>
         <div className={styles.leftCol}>
-          <StatsPanel userId={user?.userId} />
+          <StatsPanel userId={user?.user_id} />
           <AboutPanel />
         </div>
         <div className={styles.rightCol}>
           <GameLobby
-            userId={user?.userId}
+            userId={user?.user_id}
             selectedFriend={selectedFriend}
             onSelectFriend={setSelectedFriend}
             onClearFriend={() => setSelectedFriend(null)}

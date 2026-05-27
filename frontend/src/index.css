@@ -9,22 +9,18 @@ html, body {
 }
 
 :root {
-  /* spacing */
-  --space-sm: 0.75rem;   /* ~12px */
-  --space-md: 1.25rem;   /* ~20px */
-  --space-lg: 2rem;      /* ~32px */
+  --space-sm: 0.75rem;   
+  --space-md: 1.25rem;   
+  --space-lg: 2rem;      
 
-  /* font sizes */
   --text-sm: 0.9rem;
   --text-md: 1.1rem;
   --text-lg: 1.5rem;
   --text-xl: 3rem;
 
-  /* sizes */
-  --card-width: 28rem;   /* ~450px */
+  --card-width: 28rem;  
   --board-height: 10rem;
 
-  /* effects */
   --radius-md: 1rem;
   --radius-lg: 1.5rem;
 }

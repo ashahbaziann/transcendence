@@ -2,8 +2,8 @@ const express = require('express');
 const axios = require('axios');
 const app = express();
 
-const PORT = 3000; // port inside container
-const SERVICE_CHECKER_URL = 'http://service-checker:4000'; // Docker network URL
+const PORT = 3000;
+const SERVICE_CHECKER_URL = 'http://service-checker:4000'; 
 
 app.get('/', async (req, res) => {
   try {

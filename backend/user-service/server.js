@@ -21,16 +21,13 @@ app.use(cors({
 app.use(express.json());
 
 
-// Prometheus setup
 const register = new clientProm.Registry();
 clientProm.collectDefaultMetrics({ register });
 
-// PostgreSQL pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL
 });
 
-// Create users table if not exists
 pool.query(`
   CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
@@ -60,7 +57,6 @@ pool.query(`
 `).catch(err => console.error("Friends table error:", err));
 
 
-// JWT Middleware
 function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'];
   if (!authHeader) return res.status(401).json({ error: 'No token' });
@@ -79,7 +75,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Multer setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = '/app/uploads';
@@ -93,30 +88,27 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB max
+  limits: { fileSize: 2 * 1024 * 1024 }, 
   fileFilter: (req, file, cb) => {
-    const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (allowed.includes(file.mimetype)) cb(null, true);
-    else cb(new Error('Only images allowed'));
-  }
+  const allowed = ['image/jpeg', 'image/png'];
+  if (allowed.includes(file.mimetype)) cb(null, true);
+  else cb(new Error('Only JPEG and PNG images are allowed'));
+}
 });
 
 const DEFAULT_AVATAR = 'https://api.dicebear.com/7.x/identicon/svg?seed=default';
 
 // Routes
 
-// Health
 app.get('/health', (req, res) => {
   res.json({ status: `${SERVICE_NAME} running` });
 });
 
-// Metrics
 app.get('/metrics', async (req, res) => {
   res.set('Content-Type', register.contentType);
   res.end(await register.metrics());
 });
 
-// POST /users - create user profile (called by auth-service after register)
 app.post('/users', async (req, res) => {
   try {
     const { user_id, username, email } = req.body;
@@ -132,7 +124,6 @@ app.post('/users', async (req, res) => {
   }
 });
 
-// GET /users - get all users (protected)
 app.get('/users', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query('SELECT id, user_id, username, email, avatar, wins, losses, draws, created_at FROM users ORDER BY id ASC');
@@ -142,7 +133,6 @@ app.get('/users', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /users/:id - get user by user_id (protected)
 app.get('/users/:id', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query('SELECT id, user_id, username, email, avatar, wins, losses, draws, created_at FROM users WHERE user_id = $1', [req.params.id]);
@@ -155,7 +145,6 @@ app.get('/users/:id', authMiddleware, async (req, res) => {
 });
 
 
-// PUT /users/status - update online status (internal only)
 app.put('/users/status', async (req, res) => {
   try {
     const { user_id, online } = req.body;
@@ -170,7 +159,6 @@ app.put('/users/status', async (req, res) => {
 });
 
 
-// PUT /users/:id - update profile (protected, own profile only)
 app.put('/users/:id', authMiddleware, async (req, res) => {
   try {
     if (req.user.userId !== parseInt(req.params.id))
@@ -186,7 +174,6 @@ app.put('/users/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /users/:id/stats - get game stats (protected)
 app.get('/users/:id/stats', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query('SELECT username, wins, losses, draws FROM users WHERE user_id = $1', [req.params.id]);
@@ -198,7 +185,6 @@ app.get('/users/:id/stats', authMiddleware, async (req, res) => {
   }
 });
 
-// POST /users/:id/avatar - upload avatar
 app.post('/users/:id/avatar', authMiddleware, upload.single('avatar'), async (req, res) => {
   try {
     if (req.user.userId !== parseInt(req.params.id))
@@ -216,12 +202,10 @@ app.post('/users/:id/avatar', authMiddleware, upload.single('avatar'), async (re
   }
 });
 
-// Serve uploaded avatars
 app.use('/avatars', express.static('/app/uploads'));
 
 
 
-// POST /users/:id/friends/:friendId - add friend
 app.post('/users/:id/friends/:friendId', authMiddleware, async (req, res) => {
   try {
     if (req.user.userId !== parseInt(req.params.id))
@@ -243,7 +227,6 @@ app.post('/users/:id/friends/:friendId', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /users/:id/friends - get friend list
 app.get('/users/:id/friends', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -258,7 +241,6 @@ app.get('/users/:id/friends', authMiddleware, async (req, res) => {
   }
 });
 
-// DELETE /users/:id/friends/:friendId - remove friend
 app.delete('/users/:id/friends/:friendId', authMiddleware, async (req, res) => {
   try {
     if (req.user.userId !== parseInt(req.params.id))
@@ -273,7 +255,6 @@ app.delete('/users/:id/friends/:friendId', authMiddleware, async (req, res) => {
   }
 });
 
-// PUT /users/stats/internal - called by game-service after match
 app.put('/users/stats/internal', async (req, res) => {
   try {
     const { user_id, column } = req.body;
@@ -289,7 +270,33 @@ app.put('/users/stats/internal', async (req, res) => {
   }
 });
 
-// 404
+
+app.post('/users/:id/avatar', authMiddleware, (req, res, next) => {
+  upload.single('avatar')(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    next();
+  });
+}, async (req, res) => {
+  try {
+    if (req.user.userId !== parseInt(req.params.id))
+      return res.status(403).json({ error: 'Forbidden' });
+    if (!req.file)
+      return res.status(400).json({ error: 'No file uploaded' });
+    const avatarUrl = `/avatars/${req.file.filename}`;
+    const result = await pool.query(
+      'UPDATE users SET avatar = $1 WHERE user_id = $2 RETURNING *',
+      [avatarUrl, req.params.id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
 app.use((req, res) => res.status(404).send());
 
 app.listen(PORT, '0.0.0.0', () => {

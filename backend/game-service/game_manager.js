@@ -14,8 +14,7 @@ export const gameManager={
             id: roomid,
             players: [],
             time: new Date(),
-            status: 'waiting',  // 'waiting' | 'playing' | 'gameover'
-            // Game state — think of this as a struct inside your room struct
+            status: 'waiting', 
             gameState: {
                 ball: { x: W / 2, y: H / 2,
                     vx: 4 * speedmultiplier, 

@@ -68,7 +68,6 @@ function drawPowerUp(ctx, pu, t) {
   ctx.save();
   ctx.translate(pu.x, pu.y);
 
-  // subtle outer glow
   const grd = ctx.createRadialGradient(0, 0, r * 0.3, 0, 0, r * 2.0);
   grd.addColorStop(0, style.glow);
   grd.addColorStop(1, 'rgba(0,0,0,0)');
@@ -77,7 +76,6 @@ function drawPowerUp(ctx, pu, t) {
   ctx.arc(0, 0, r * 2.0, 0, Math.PI * 2);
   ctx.fill();
 
-  // spinning dashed ring
   ctx.save();
   ctx.rotate(t * 0.002);
   ctx.strokeStyle = style.color;
@@ -90,14 +88,12 @@ function drawPowerUp(ctx, pu, t) {
   ctx.setLineDash([]);
   ctx.restore();
 
-  // solid circle
   ctx.globalAlpha = 1;
   ctx.fillStyle   = style.color;
   ctx.beginPath();
   ctx.arc(0, 0, r, 0, Math.PI * 2);
   ctx.fill();
 
-  // very subtle inner shine
   const shine = ctx.createRadialGradient(-r * 0.25, -r * 0.25, 0, 0, 0, r);
   shine.addColorStop(0, 'rgba(255,255,255,0.2)');
   shine.addColorStop(1, 'rgba(0,0,0,0.1)');
@@ -106,7 +102,6 @@ function drawPowerUp(ctx, pu, t) {
   ctx.arc(0, 0, r, 0, Math.PI * 2);
   ctx.fill();
 
-  // icon
   ctx.fillStyle   = '#fff';
   ctx.strokeStyle = '#fff';
   ctx.shadowColor = 'rgba(0,0,0,0.4)';
@@ -148,18 +143,15 @@ export default function GameCanvas({
       const bg        = bgRef.current;
       const t         = frameRef.current++;
 
-      // background
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
       if (!state) { animId = requestAnimationFrame(draw); return; }
 
-      // board border — slightly lighter than bg
       ctx.strokeStyle = 'rgba(255,255,255,0.06)';
       ctx.lineWidth   = 1.5;
       ctx.strokeRect(1, 1, CANVAS_WIDTH - 2, CANVAS_HEIGHT - 2);
 
-      // subtle grid
       ctx.strokeStyle = 'rgba(255,255,255,0.02)';
       ctx.lineWidth   = 1;
       for (let x = 80; x < CANVAS_WIDTH; x += 80) {
@@ -169,7 +161,6 @@ export default function GameCanvas({
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CANVAS_WIDTH, y); ctx.stroke();
       }
 
-      // center dashed line
       ctx.strokeStyle = 'rgba(255,255,255,0.06)';
       ctx.setLineDash([10, 14]);
       ctx.lineWidth   = 1.5;
@@ -179,7 +170,6 @@ export default function GameCanvas({
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // player name labels
       ctx.font         = '500 12px Inter, system-ui, sans-serif';
       ctx.textAlign    = 'center';
       ctx.textBaseline = 'top';
@@ -187,7 +177,6 @@ export default function GameCanvas({
       ctx.fillText(p1Ref.current, CANVAS_WIDTH / 4,       8);
       ctx.fillText(p2Ref.current, (CANVAS_WIDTH / 4) * 3, 8);
 
-      // scores
       ctx.font      = '700 38px monospace';
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
       ctx.fillText(state.left.score,  CANVAS_WIDTH / 4,       26);
@@ -195,7 +184,6 @@ export default function GameCanvas({
       ctx.textBaseline = 'alphabetic';
       ctx.textAlign    = 'start';
 
-      // ball — very subtle glow
       ctx.save();
       ctx.globalAlpha = 0.08;
       const ballGlow = ctx.createRadialGradient(
@@ -210,13 +198,11 @@ export default function GameCanvas({
       ctx.fill();
       ctx.restore();
 
-      // ball
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.arc(state.ball.x, state.ball.y, BALL_RADIUS, 0, Math.PI * 2);
       ctx.fill();
 
-      // left paddle — very subtle glow
       ctx.save();
       ctx.globalAlpha = 0.08;
       ctx.shadowColor = '#1D9E75';
@@ -227,13 +213,11 @@ export default function GameCanvas({
       ctx.fill();
       ctx.restore();
 
-      // left paddle solid
       ctx.fillStyle = '#1D9E75';
       ctx.beginPath();
       ctx.roundRect(20, state.left.y, PADDLE_WIDTH, state.left.height, 4);
       ctx.fill();
 
-      // right paddle — very subtle glow
       ctx.save();
       ctx.globalAlpha = 0.08;
       ctx.shadowColor = '#E24B4A';
@@ -244,13 +228,11 @@ export default function GameCanvas({
       ctx.fill();
       ctx.restore();
 
-      // right paddle solid
       ctx.fillStyle = '#E24B4A';
       ctx.beginPath();
       ctx.roundRect(CANVAS_WIDTH - 20 - PADDLE_WIDTH, state.right.y, PADDLE_WIDTH, state.right.height, 4);
       ctx.fill();
 
-      // power-ups
       activePUs.forEach((pu) => drawPowerUp(ctx, pu, t));
 
       animId = requestAnimationFrame(draw);

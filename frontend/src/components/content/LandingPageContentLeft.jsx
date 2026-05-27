@@ -14,12 +14,10 @@ export default function LandingPageContentLeft() {
         let dx = vel.dx;
         let dy = vel.dy;
 
-        // LEFT / RIGHT WALL
         if (x <= 0 || x >= 95) {
           dx = -dx;
         }
 
-        // TOP / BOTTOM WALL
         if (y <= 0 || y >= 90) {
           dy = -dy;
         }
@@ -28,8 +26,7 @@ export default function LandingPageContentLeft() {
 
         return { x, y };
       });
-    }, 16); // ~60fps (smooth like a game)
-
+    }, 16); 
     return () => clearInterval(interval);
   }, [vel]);
 

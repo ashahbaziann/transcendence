@@ -16,14 +16,12 @@ export default function CallbackPage() {
 
     if (!token) { navigate("/"); return; }
 
-    // If opened as a popup for Player 2 login, pass token to parent and close
     if (window.opener) {
       window.opener.postMessage({ type: 'PLAYER2_TOKEN', token }, '*');
       window.close();
       return;
     }
 
-    // Normal flow — log in and go home
     login(token).then(() => navigate("/home"));
   }, []);
 

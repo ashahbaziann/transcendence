@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import styles from "./FriendsList.module.css";
 
 
-// Inga added May 23 - onInvite in function signature
 export default function FriendsList({ userId, onInvite }) {
   const [friends, setFriends] = useState([]);
   const [searchInput, setSearchInput] = useState("");
@@ -33,7 +32,6 @@ export default function FriendsList({ userId, onInvite }) {
     });
     const data = await res.json();
     if (!res.ok || !data) { setError("User not found"); return; }
-    // find matching user from list
     const found = Array.isArray(data)
       ? data.find(u => u.username.toLowerCase() === searchInput.trim().toLowerCase())
       : null;
@@ -132,4 +130,3 @@ export default function FriendsList({ userId, onInvite }) {
   );
 }
 
-//Inga added May 23 - onInvite prop passed to FriendsList and invite button rendered for online friends.

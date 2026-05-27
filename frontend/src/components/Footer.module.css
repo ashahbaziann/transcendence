@@ -1,0 +1,88 @@
+.footer {
+  width: fit-content;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+
+  margin: auto auto 20px auto; /* pushes it to bottom center */
+
+  padding: 10px 18px;
+
+  background: transparent;
+}
+
+.brand {
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  background: linear-gradient(
+    90deg,
+    #ffffff,
+    #c4b5fd,
+    #93c5fd
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  opacity: 0.9;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.link {
+  position: relative;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+
+  transition: color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+.link:hover {
+  color: white;
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+
+  width: 0%;
+  height: 1px;
+
+  background: rgba(255,255,255,0.7);
+  transition: width 0.2s ease;
+}
+
+.link:hover::after {
+  width: 100%;
+}
+
+.sep {
+  color: rgba(255,255,255,0.2);
+  font-size: 11px;
+}
+
+@media (max-width: 600px) {
+  .footer {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}

@@ -10,7 +10,7 @@ export default function LoginForm() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
 
-  // 2FA state
+
   const [requires2fa, setRequires2fa] = useState(false);
   const [loginTicket, setLoginTicket] = useState("");
   const [otp, setOtp] = useState("");
@@ -40,14 +40,13 @@ export default function LoginForm() {
         return;
       }
 
-      // Backend requires 2FA
+      
       if (data.requires2fa && data.loginTicket) {
         setLoginTicket(data.loginTicket);
         setRequires2fa(true);
         return;
       }
 
-      // Normal login — got token directly
       await login(data.token);
       navigate("/home");
 
@@ -88,7 +87,6 @@ export default function LoginForm() {
     }
   };
 
-  // ── 2FA OTP screen ──────────────────────────────────────────────────────────
   if (requires2fa) {
     return (
       <div>
@@ -141,7 +139,6 @@ export default function LoginForm() {
     );
   }
 
-  // ── Normal login screen ─────────────────────────────────────────────────────
   return (
     <div>
       <form className={styles.card} onSubmit={handleSubmit}>

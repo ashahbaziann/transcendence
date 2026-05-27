@@ -159,12 +159,11 @@ services:
     depends_on:
       - prometheus
 
-# Custom network for all services
+
 networks:
   transcendence-net:
     driver: bridge
 
-# Persistent volume for database
 volumes:
   postgres_data:
   grafana_data:

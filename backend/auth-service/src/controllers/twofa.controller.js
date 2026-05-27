@@ -8,7 +8,6 @@ const jwt = require('jsonwebtoken');
 
 const prisma = new PrismaClient();
 
-// ___ ВКЛЮЧЕНИЕ 2FA ___
 async function enable2fa(req, res)
 {
     try{
@@ -35,7 +34,6 @@ async function enable2fa(req, res)
 }
 
 
-// ___ ПОДТВЕРЖДЕНИЕ 2FA ___
 
 async function verify2fa(req, res){
     try{
@@ -77,7 +75,6 @@ async function verify2fa(req, res){
 }
 
 
-// ___ ЛОГИН С 2FA ___
 
 async function login2fa(req, res) {
     try{

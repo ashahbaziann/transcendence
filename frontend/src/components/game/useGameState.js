@@ -61,7 +61,6 @@ export function useGameState() {
   const [settings, setSettings]     = useState(null);
   const [error, setError]           = useState(null);
 
-  // Call this before reopening sockets for a new game
   const reset = useCallback(() => {
     setGameStatus("connecting");
     setSide1(null);

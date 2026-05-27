@@ -23,7 +23,6 @@ export default function GamePage() {
   const [player1Name, setPlayer1Name] = useState('Player 1');
   const [player2Name, setPlayer2Name] = useState(opponentName || 'Player 2');
 
-  // Fetch player 1 username from user-service using JWT userId
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;

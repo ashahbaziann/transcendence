@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
     return res.json();
   };
 
-  // 🔥 SINGLE AUTH CHECK ON START
+
   useEffect(() => {
     const initAuth = async () => {
       if (!token) {

@@ -20,7 +20,6 @@
         const ctx = canvas.getContext('2d');
         const info = document.getElementById('info');
         
-        // Match this to your server port
         const socket = new WebSocket('ws://localhost:3000');
 
         let mySide = null;
@@ -51,11 +50,9 @@
         function draw() {
             if (!gameState) return;
 
-            // Clear Screen
             ctx.fillStyle = "black";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw Center Line
             ctx.strokeStyle = "#333";
             ctx.setLineDash([10, 10]);
             ctx.beginPath();
@@ -63,32 +60,27 @@
             ctx.lineTo(canvas.width / 2, canvas.height);
             ctx.stroke();
 
-            // Draw Paddles
             ctx.setLineDash([]);
-            ctx.fillStyle = "#3498db"; // Left Blue
+            ctx.fillStyle = "#3498db"; 
             ctx.fillRect(20, gameState.left.y, 12, 90);
 
-            ctx.fillStyle = "#e74c3c"; // Right Red
+            ctx.fillStyle = "#e74c3c";
             ctx.fillRect(canvas.width - 20 - 12, gameState.right.y, 12, 90);
 
-            // Draw Ball
             ctx.fillStyle = "white";
             ctx.beginPath();
             ctx.arc(gameState.ball.x, gameState.ball.y, 8, 0, Math.PI * 2);
             ctx.fill();
 
-            // Draw Scores
             ctx.font = "30px Monospace";
             ctx.fillText(gameState.left.score, canvas.width / 4, 50);
             ctx.fillText(gameState.right.score, (canvas.width / 4) * 3, 50);
         }
 
-        // Handle Keys
         const handleKey = (e, isPressed) => {
     let keyToSend = null;
     const k = e.key;
 
-    // Allow all keys regardless of which "side" the browser thinks it is
     if (k === 'w' || k === 's' || k === 'ArrowUp' || k === 'ArrowDown') {
         keyToSend = k;
     }

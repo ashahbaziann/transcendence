@@ -4,8 +4,7 @@ export function useGameSocket(onMessage, enabled = true, token = null) {
   const socketRef    = useRef(null);
   const onMessageRef = useRef(onMessage);
   const [isReady, setIsReady]       = useState(false);
-  const [connectKey, setConnectKey] = useState(0); // bump to force reconnect
-
+  const [connectKey, setConnectKey] = useState(0); 
   useEffect(() => {
     onMessageRef.current = onMessage;
   }, [onMessage]);
@@ -23,9 +22,8 @@ export function useGameSocket(onMessage, enabled = true, token = null) {
       return;
     }
 
-    // Close any existing socket first
     if (socketRef.current) {
-      socketRef.current.onclose = null; // suppress the disconnected message on manual close
+      socketRef.current.onclose = null; 
       socketRef.current.close();
       socketRef.current = null;
     }
@@ -68,19 +66,18 @@ export function useGameSocket(onMessage, enabled = true, token = null) {
     };
 
     return () => {
-      socket.onclose = null; // suppress disconnect message on cleanup
+      socket.onclose = null; 
       socket.close();
       setIsReady(false);
     };
-  }, [enabled, token, connectKey]); // connectKey triggers a fresh connection
-
+  }, [enabled, token, connectKey]); 
   const send = useCallback((data) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
       socketRef.current.send(JSON.stringify(data));
     }
   }, []);
 
-  // Call this to close the current socket and open a brand new one
+  
   const reconnect = useCallback(() => {
     setIsReady(false);
     setConnectKey((k) => k + 1);

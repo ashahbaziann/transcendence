@@ -8,6 +8,8 @@
   gap: 15px;
   box-shadow: 0 15px 40px rgba(0,0,0,0.4);
   min-width: 300px;
+  max-width: 100%; 
+  box-sizing: border-box; 
   animation: popIn 0.6s ease-out;
 }
 
@@ -21,16 +23,21 @@
 .addWrapper {
   display: flex;
   gap: 10px;
+  width: 100%;            
+  max-width: 100%;        
+  box-sizing: border-box; 
 }
 
 .input {
   flex: 1;
+  min-width: 0;           
   padding: 10px 14px;
   border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.2);
   background: rgba(255,255,255,0.05);
   color: white;
   outline: none;
+  box-sizing: border-box; 
 }
 
 .input:focus {
@@ -46,6 +53,8 @@
   font-weight: bold;
   cursor: pointer;
   transition: 0.2s;
+  white-space: nowrap;    
+  flex-shrink: 0;         
 }
 
 .button:hover {
@@ -71,6 +80,7 @@
   padding: 10px;
   border-radius: 10px;
   background: rgba(255,255,255,0.05);
+  box-sizing: border-box;
 }
 
 .avatar {
@@ -78,17 +88,22 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  flex-shrink: 0; 
 }
 
 .info {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0; 
 }
 
 .username {
   color: white;
   font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; 
 }
 
 .online {
@@ -108,6 +123,7 @@
   cursor: pointer;
   font-size: 16px;
   transition: 0.2s;
+  flex-shrink: 0;
 }
 
 .remove:hover {
@@ -127,9 +143,18 @@
   margin-bottom: 10px;
   background: rgba(255,255,255,0.05);
   border-radius: 8px;
+  box-sizing: border-box;
 }
 
 @keyframes popIn {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
+}
+
+
+@media (max-width: 400px) {
+  .card {
+    padding: 20px 15px;
+    min-width: 100%;
+  }
 }

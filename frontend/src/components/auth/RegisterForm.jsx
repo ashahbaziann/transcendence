@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import styles from "./AuthForm.module.css"
 
 
-// function to handle API call
 async function registerUser(data) {
   const response = await fetch("http://localhost:3005/auth/register", {
     method: "POST",
@@ -16,7 +15,6 @@ async function registerUser(data) {
   const result = await response.json();
 
   if (!response.ok) {
-    // throw backend error so catch() runs
     throw result;
   }
 
@@ -25,49 +23,27 @@ async function registerUser(data) {
 
 export default function RegisterForm() {
   const navigate = useNavigate();
-  // state to store input values
   const [form, setForm] = useState({
     username: "",
     email: "",
     password: "",
   });
 
-  // update state when user types
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  // // handle form submit
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const res = await registerUser(form);
-
-  //     console.log("Success:", res);
-  //     alert(res.message || "Registered successfully!");
-
-  //     // navigate("/game");
-  //   } catch (err) {
-  //     console.error("Error:", err);
-  //     alert(err.error || "Registration failed!");
-  //   }
-  // };
-
-
-   const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const res = await registerUser(form);
-      console.log("Success:", res);
-      setForm({ username: "", email: "", password: "" }); // clear form
-      alert(res.message || "Registered successfully!");
-     // navigate("/login"); // redirect to login
-    } catch (err) {
-      console.error("Error:", err);
-      alert(err.error || "Registration failed!");
-    }
+  try {
+    const res = await registerUser(form);
+    console.log("Success:", res);
+    setForm({ username: "", email: "", password: "" }); 
+    alert(res.message || "Registered successfully!");
+  } catch (err) {
+    console.error("Error:", err);
+    alert(err.error || "Registration failed!");
+  }
   };
 
   return (

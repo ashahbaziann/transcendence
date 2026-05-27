@@ -2,9 +2,9 @@ const express = require('express');
 const axios = require('axios');
 
 const app = express();
-const PORT = 4000; // separate port for healthcheck
+const PORT = 4000; 
 
-// List of services to check
+
 const services = {
   "auth-service": "http://auth-service:3000/health",
   "user-service": "http://user-service:3000/health",

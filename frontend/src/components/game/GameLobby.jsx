@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
 import styles from './GameLobby.module.css';
+import { useState, useEffect, useRef } from 'react';
+
 
 const BG_THEMES = [
   { id: 'classic', label: 'Classic', color: '#111111' },
@@ -25,6 +26,12 @@ export default function GameLobby({ userId, selectedFriend, onSelectFriend, onCl
   const [player2Password, setPlayer2Password] = useState('');
   const [player2Error,    setPlayer2Error]    = useState('');
   const [player2Loading,  setPlayer2Loading]  = useState(false);
+
+  const selectedFriendRef = useRef(selectedFriend);
+
+  useEffect(() => {
+    selectedFriendRef.current = selectedFriend;
+  }, [selectedFriend]);
 
   const canStart = mode === 'local' || (mode === 'friend' && selectedFriend && player2Token);
 
@@ -53,7 +60,18 @@ export default function GameLobby({ userId, selectedFriend, onSelectFriend, onCl
   useEffect(() => {
     function handleMessage(e) {
       if (e.data?.type === 'PLAYER2_TOKEN') {
-        setPlayer2Token(e.data.token);
+      const token = e.data.token;
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.userId !== selectedFriendRef.current?.user_id) {
+          setPlayer2Error(`This is not ${selectedFriendRef.current?.username}'s account.`);
+          return;
+        }
+      } catch {
+        setPlayer2Error('Invalid token received');
+        return;
+      }
+      setPlayer2Token(token);
       }
     }
     window.addEventListener('message', handleMessage);
@@ -87,6 +105,16 @@ export default function GameLobby({ userId, selectedFriend, onSelectFriend, onCl
         setPlayer2Requires2fa(true);
         return;
       }
+      try {
+        const payload = JSON.parse(atob(data.token.split('.')[1]));
+        if (payload.userId !== selectedFriend?.user_id) {
+          setPlayer2Error(`This is not ${selectedFriend?.username}'s account.`);
+          return;
+        }
+      } catch {
+        setPlayer2Error('Invalid token');
+        return;
+      }
       setPlayer2Token(data.token);
     } catch {
       setPlayer2Error('Could not connect to server');
@@ -106,6 +134,16 @@ export default function GameLobby({ userId, selectedFriend, onSelectFriend, onCl
       });
       const data = await res.json();
       if (!res.ok) { setPlayer2Error(data.error || 'Invalid code'); return; }
+      try {
+        const payload = JSON.parse(atob(data.token.split('.')[1]));
+        if (payload.userId !== selectedFriend?.user_id) {
+          setPlayer2Error(`This is not ${selectedFriend?.username}'s account.`);
+          return;
+        }
+      } catch {
+        setPlayer2Error('Invalid token');
+        return;
+      }
       setPlayer2Token(data.token);
     } catch {
       setPlayer2Error('Could not connect to server');

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getMe } from '../api';
+import { getMe, getUserById } from '../api';
 
 export function useCurrentUser() {
   const [user, setUser]     = useState(null);
@@ -8,6 +8,7 @@ export function useCurrentUser() {
 
   useEffect(() => {
     getMe()
+      .then(me => getUserById(me.userId))
       .then(setUser)
       .catch(setError)
       .finally(() => setLoading(false));
