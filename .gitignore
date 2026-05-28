@@ -3,3 +3,7 @@ backups/dumps/
 
 node_modules/
 **/.cache/
+.env
+**/.env
+.env
+**/.env
