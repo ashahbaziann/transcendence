@@ -23,10 +23,10 @@ migrate:
 		sleep 2; \
 	done
 	@echo "Postgres is ready!"
-	docker compose exec postgres sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -c "CREATE TABLE IF NOT EXISTS games (id TEXT PRIMARY KEY, \"roomId\" BIGINT UNIQUE, \"winnerId\" INT, \"loserId\" INT, \"winnerScore\" INT DEFAULT 0, \"loserScore\" INT DEFAULT 0, duration INT, status TEXT DEFAULT '\''waiting'\'', \"createdAt\" TIMESTAMP DEFAULT NOW(), \"endedAt\" TIMESTAMP);"'
+	@docker compose exec postgres sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -c "CREATE TABLE IF NOT EXISTS games (id TEXT PRIMARY KEY, \"roomId\" BIGINT UNIQUE, \"winnerId\" INT, \"loserId\" INT, \"winnerScore\" INT DEFAULT 0, \"loserScore\" INT DEFAULT 0, duration INT, status TEXT DEFAULT '\''waiting'\'', \"createdAt\" TIMESTAMP DEFAULT NOW(), \"endedAt\" TIMESTAMP);"'
 	@sleep 8
 	@echo "All done! Checking tables:"
-	docker compose exec postgres sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -c "\dt"'
+	@docker compose exec postgres sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -c "\dt"'
 	
 logs:
 	docker compose logs --follow
@@ -42,8 +42,8 @@ fclean: clean
 	docker system prune -af
 
 nuke:
-	docker stop $(shell docker ps -aq) 2>/dev/null || true
-	docker rm $(shell docker ps -aq) 2>/dev/null || true
+	@docker stop $(shell docker ps -aq) 2>/dev/null || true
+	@docker rm $(shell docker ps -aq) 2>/dev/null || true
 	docker system prune -af
 
 backup:
@@ -52,6 +52,6 @@ backup:
 restore:
 	@echo "Usage: make restore FILE=backups/dumps/backup_YYYY-MM-DD_HH-MM-SS.sql"
 	@test -n "$(FILE)" || exit 1
-	docker exec -i postgres psql -U ${POSTGRES_USER:-admin} ${POSTGRES_DB:-transcendence} < $(FILE)
+	@docker exec -i postgres psql -U ${POSTGRES_USER:-admin} ${POSTGRES_DB:-transcendence} < $(FILE)
 
 .PHONY: all up down re stop start clean fclean logs ps migrate nuke backup restore
